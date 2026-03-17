@@ -19,6 +19,17 @@ app.use(express.json()); // Giải mã JSON request body
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+
+// Phải đặt trước các định nghĩa Route
+app.use(cors({
+    origin: 'http://localhost:5173', // Địa chỉ của Frontend (Vite)
+    credentials: true,               // Quan trọng: Cho phép gửi/nhận Cookie (JWT)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+
+
 // --- ROUTES ---
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes); // Thêm route cho auth

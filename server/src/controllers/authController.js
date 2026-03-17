@@ -34,69 +34,54 @@ const generateRefreshToken = (id) => {
 ============================== */
 
 export const register = async (req, res) => {
-
     try {
+        const { name, email, password, repassword, phone } = req.body;
 
-        const { name, email, password, repassword, phone } = req.body
-
+        // 1. Kiểm tra đầu vào
         if (!name || !email || !password || !repassword) {
             return res.status(400).json({
                 success: false,
-                message: "Vui lòng nhập đầy đủ thông tin"
-            })
+                message: "Vui lòng nhập đầy đủ các trường bắt buộc"
+            });
         }
 
         if (password !== repassword) {
             return res.status(400).json({
                 success: false,
                 message: "Mật khẩu xác nhận không khớp"
-            })
+            });
         }
 
-        if (password.length < 6) {
+        // 2. Kiểm tra email tồn tại
+        const userExists = await User.findOne({ email });
+        if (userExists) {
             return res.status(400).json({
                 success: false,
-                message: "Mật khẩu phải ít nhất 6 ký tự"
-            })
+                message: "Email này đã được đăng ký tài khoản"
+            });
         }
 
-        const existUser = await User.findOne({ email })
-
-        if (existUser) {
-            return res.status(400).json({
-                success: false,
-                message: "Email đã tồn tại"
-            })
-        }
-
+        // 3. Mã hóa mật khẩu (Nếu model User chưa có middleware .pre('save'))
+        const hashedPassword = await bcrypt.hash(password, 10);
+        // 4. Tạo User mới
         const user = await User.create({
             name,
             email,
-            password,
-            phone
-        })
+            phone,
+            password: hashedPassword,
+            role: 'customer' // Mặc định là customer để an toàn theo hướng 2
+        });
 
         res.status(201).json({
             success: true,
-            message: "Đăng ký thành công",
-            data: {
-                id: user._id,
-                name: user.name,
-                email: user.email
-            }
-        })
+            message: "Đăng ký tài khoản thành công",
+            user: { id: user._id, name: user.name, email: user.email }
+        });
 
     } catch (error) {
-
-        res.status(500).json({
-            success: false,
-            message: error.message
-        })
-
+        res.status(500).json({ success: false, message: error.message });
     }
-
 }
-
 
 
 /* ==============================

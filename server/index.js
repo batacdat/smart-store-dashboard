@@ -4,6 +4,10 @@ import cors from 'cors'; // Nếu đã cài npm install cors
 import connectDB from './src/config/db.js';
 import productRoutes from './src/routes/productRoutes.js';
 import authRoutes from './src/routes/authRoutes.js'; // Import route cho auth
+import cookieParser from "cookie-parser";
+
+
+
 dotenv.config();
 connectDB();
 
@@ -13,6 +17,7 @@ const app = express();
 app.use(cors()); // Cho phép gọi API từ bên ngoài
 app.use(express.json()); // Giải mã JSON request body
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // --- ROUTES ---
 app.use('/api/products', productRoutes);

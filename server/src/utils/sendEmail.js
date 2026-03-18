@@ -23,12 +23,10 @@ const sendEmail = async (to, subject, text) => {
     try {
 
         const mailOptions = {
-
-            from: `"Smart Store" <${process.env.EMAIL_USER}>`,
-            to,
-            subject,
-            text
-
+            from: `"ChongThamBaoLinh" <${process.env.EMAIL_USER}>`,
+            to: to,      // Phải là biến 'to' nhận từ tham số
+            subject: subject,
+            text: text   // Phải là biến 'text' nhận từ tham số
         };
 
         const info = await transporter.sendMail(mailOptions);

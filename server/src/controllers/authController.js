@@ -128,61 +128,117 @@ export const register = async (req, res) => {
     }
 }
 
-/* ==============================
-   3. SEND OTP (Đăng nhập bằng Số điện thoại)
-============================== */
-export const sendOTP = async (req, res) => {
+export const login = async (req, res) => {
     try {
-        const { phone, password, isAdminPortal } = req.body;
-
-        if (!phone || !password) {
-            return res.status(400).json({ success: false, message: "Vui lòng nhập số điện thoại và mật khẩu" });
-        }
-
-        // Tìm user theo phone và lấy cả password ẩn
-        const user = await User.findOne({ phone }).select("+password");
+        const { phone, email, password, isAdminPortal } = req.body;
         
-        if (!user) {
-            return res.status(404).json({ success: false, message: "Tài khoản không tồn tại" });
+        // 1. Xác định query dựa trên cổng đăng nhập
+        const query = isAdminPortal ? { email } : { phone };
+        
+        // 2. Tìm user và lấy password ẩn
+        const user = await User.findOne(query).select("+password");
+
+        // 3. Kiểm tra user tồn tại và mật khẩu
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Thông tin đăng nhập không chính xác" 
+            });
         }
 
-        if (isAdminPortal && user.role !== "admin") {
-            return res.status(403).json({ success: false, message: "Bạn không có quyền truy cập trang quản trị" });
+        // 4. Kiểm tra quyền truy cập nếu là trang Admin
+        if (isAdminPortal && user.role !== 'admin') {
+            return res.status(403).json({ 
+                success: false, 
+                message: "Bạn không có quyền truy cập trang quản trị" 
+            });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ success: false, message: "Mật khẩu không chính xác" });
+        // 5. Phân luồng xử lý
+        if (user.role === 'admin' && isAdminPortal) {
+            // Luồng Admin: Yêu cầu bước OTP (không trả token ở đây)
+            // Chúng ta sẽ gọi hàm sendOTP bên dưới thông qua logic Frontend hoặc gọi nội bộ
+            return res.status(200).json({
+                success: true,
+                requiresOTP: true,
+                message: "Thông tin hợp lệ, vui lòng kiểm tra email nhận mã OTP"
+            });
+        } else {
+            // Luồng Customer: Đăng nhập thành công ngay lập tức
+            const token = generateToken(user._id);
+            res.status(200).json({ 
+                success: true, 
+                token, 
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    phone: user.phone,
+                    role: user.role
+                }
+            });
         }
-
-        // Tạo mã OTP ngẫu nhiên 6 số
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const salt = await bcrypt.genSalt(10);
-        user.otp = await bcrypt.hash(otp, salt);
-        user.otpExpire = Date.now() + 5 * 60 * 1000; // Hết hạn sau 5 phút
-        await user.save();
-
-        // MÔ PHỎNG GỬI SMS: Log ra console (Bạn hãy tích hợp SMS API tại đây)
-        console.log(`[SMS] OTP gửi tới số ${phone}: ${otp}`);
-
-        res.status(200).json({
-            success: true,
-            message: "Mã OTP đã được gửi tới số điện thoại của bạn"
-        });
-
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-}
+};
+
 
 /* ==============================
-   4. VERIFY OTP (Dùng phone)
+   3. SEND OTP (Đăng nhập bằng Email cho Admin)
+============================== */
+export const sendOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Admin không tồn tại" });
+        }
+
+        // 1. Tạo OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const salt = await bcrypt.genSalt(10);
+        user.otp = await bcrypt.hash(otp, salt);
+        user.otpExpire = Date.now() + 3 * 60 * 1000;
+        await user.save();
+
+        // 2. Gửi Email (Quan trọng: Phải dùng await)
+        try {
+            await sendEmail(
+            user.email,                           // Tham số 'to'
+            "Mã xác thực Admin Login",            // Tham số 'subject'
+            `Mã OTP của bạn là: ${otp}. Mã có hiệu lực trong 3 phút.` // Tham số 'text'
+        );
+
+            res.status(200).json({
+                success: true,
+                message: "Mã OTP đã được gửi tới email của bạn"
+            });
+        } catch (mailError) {
+            // Nếu gửi mail lỗi, xóa OTP trong DB để tránh rác dữ liệu
+            user.otp = undefined;
+            user.otpExpire = undefined;
+            await user.save();
+            
+            console.error("Lỗi gửi mail:", mailError);
+            return res.status(500).json({ 
+                success: false, 
+                message: "Hệ thống không thể gửi email. Vui lòng kiểm tra cấu hình SMTP." 
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+/* ==============================
+   4. VERIFY OTP (Dùng email)
 ============================== */
 export const verifyOTP = async (req, res) => {
     try {
-        const { phone, otp } = req.body;
+        const { email, otp } = req.body;
 
-        const user = await User.findOne({ phone });
+        const user = await User.findOne({ email });
         if (!user || !user.otp) {
             return res.status(400).json({ success: false, message: "Yêu cầu không hợp lệ" });
         }
@@ -206,13 +262,12 @@ export const verifyOTP = async (req, res) => {
             success: true,
             message: "Đăng nhập thành công",
             token,
-            user: { id: user._id, name: user.name, phone: user.phone, role: user.role }
+            user: { id: user._id, name: user.name, email: user.email, role: user.role }
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 }
-
 
 
 

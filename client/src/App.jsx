@@ -9,13 +9,14 @@ import Dashboard from './pages/admin/Dashboard';
 import ProductManagement from './pages/admin/ProductManagement'; // File bạn vừa tạo
 import AddProduct from './pages/admin/AddProduct';
 import EditProduct from './pages/admin/EditProduct';
+import ForgotPassword from './pages/auth/ForgotPassword';
 
 function App() {
   const location = useLocation();
   const [isCollapsed, setisCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  const isAuthPage = ['/login', '/system-gateway', '/register'].includes(location.pathname);
+  const isAuthPage = ['/login', '/system-gateway', '/register', '/forgot-password'].includes(location.pathname);
 
   return (
     <div className="min-h-screen w-full bg-slate-50 flex overflow-hidden font-sans"> 
@@ -46,6 +47,7 @@ function App() {
             <Route path="/login" element={<UserLoginPage />} />
             <Route path="/register" element={<UserRegisterPage />} />
             <Route path="/system-gateway" element={<AdminLoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
 
             {/* Admin Routes */}
             <Route path="/admin/dashboard" element={<Dashboard />} />

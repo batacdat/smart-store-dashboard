@@ -9,7 +9,8 @@ import {
     changePassword,
     forgotPassword,
     logout,
-    resetPassword
+    resetPassword,
+    login
 } from "../controllers/authController.js";
 
 import {
@@ -37,7 +38,7 @@ router.post("/register-admin", protect, admin, registerAdmin);
 LOGIN WITH OTP
 ================================
 */
-
+router.post('/login', login);
 // login bước 1 (email + password)
 router.post("/send-otp", sendOTP);
 

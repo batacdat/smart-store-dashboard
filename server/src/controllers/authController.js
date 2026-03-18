@@ -30,61 +30,6 @@ const generateRefreshToken = (id) => {
 
 
 /* ==============================
-   2. REGISTER USER
-============================== */
-
-export const register = async (req, res) => {
-    try {
-        const { name, email, password, repassword, phone } = req.body;
-
-        // 1. Kiểm tra đầu vào
-        if (!name || !email || !password || !repassword) {
-            return res.status(400).json({
-                success: false,
-                message: "Vui lòng nhập đầy đủ các trường bắt buộc"
-            });
-        }
-
-        if (password !== repassword) {
-            return res.status(400).json({
-                success: false,
-                message: "Mật khẩu xác nhận không khớp"
-            });
-        }
-
-        // 2. Kiểm tra email tồn tại
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({
-                success: false,
-                message: "Email này đã được đăng ký tài khoản"
-            });
-        }
-
-        // 3. Mã hóa mật khẩu (Nếu model User chưa có middleware .pre('save'))
-        const hashedPassword = await bcrypt.hash(password, 10);
-        // 4. Tạo User mới
-        const user = await User.create({
-            name,
-            email,
-            phone,
-            password: hashedPassword,
-            role: 'customer' // Mặc định là customer để an toàn theo hướng 2
-        });
-
-        res.status(201).json({
-            success: true,
-            message: "Đăng ký tài khoản thành công",
-            user: { id: user._id, name: user.name, email: user.email }
-        });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-}
-
-
-/* ==============================
    3. REGISTER ADMIN
 ============================== */
 
@@ -136,155 +81,138 @@ export const registerAdmin = async (req, res) => {
 }
 
 
+/* ==============================
+   2. REGISTER USER (Bỏ Email)
+============================== */
+export const register = async (req, res) => {
+    try {
+        const { name, password, repassword, phone } = req.body;
+
+        if (!name || !password || !repassword || !phone) {
+            return res.status(400).json({
+                success: false,
+                message: "Vui lòng nhập đầy đủ các trường bắt buộc"
+            });
+        }
+
+        if (password !== repassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Mật khẩu xác nhận không khớp"
+            });
+        }
+
+        // Kiểm tra số điện thoại đã tồn tại chưa
+        const userExists = await User.findOne({ phone });
+        if (userExists) {
+            return res.status(400).json({
+                success: false,
+                message: "Số điện thoại này đã được đăng ký"
+            });
+        }
+
+        const user = await User.create({
+            name,
+            phone,
+            password,
+            role: 'customer'
+        });
+
+        res.status(201).json({
+            success: true,
+            message: "Đăng ký tài khoản thành công"
+        });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
 
 /* ==============================
-   4. SEND OTP LOGIN
+   3. SEND OTP (Đăng nhập bằng Số điện thoại)
 ============================== */
-
 export const sendOTP = async (req, res) => {
-
     try {
+        const { phone, password, isAdminPortal } = req.body;
 
-        const { email, password } = req.body
+        if (!phone || !password) {
+            return res.status(400).json({ success: false, message: "Vui lòng nhập số điện thoại và mật khẩu" });
+        }
 
-        const user = await User.findOne({ email }).select("+password")
-
+        // Tìm user theo phone và lấy cả password ẩn
+        const user = await User.findOne({ phone }).select("+password");
+        
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "Email không tồn tại"
-            })
+            return res.status(404).json({ success: false, message: "Tài khoản không tồn tại" });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password)
+        if (isAdminPortal && user.role !== "admin") {
+            return res.status(403).json({ success: false, message: "Bạn không có quyền truy cập trang quản trị" });
+        }
 
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({
-                success: false,
-                message: "Mật khẩu không đúng"
-            })
+            return res.status(401).json({ success: false, message: "Mật khẩu không chính xác" });
         }
 
-        if (user.otpExpire && user.otpExpire > Date.now()) {
-            return res.status(400).json({
-                success: false,
-                message: "Lỗi OTP đã được gửi, vui lòng chờ trước khi yêu cầu OTP mới"
-            })
-        }
+        // Tạo mã OTP ngẫu nhiên 6 số
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const salt = await bcrypt.genSalt(10);
+        user.otp = await bcrypt.hash(otp, salt);
+        user.otpExpire = Date.now() + 5 * 60 * 1000; // Hết hạn sau 5 phút
+        await user.save();
 
-        const otp = Math.floor(100000 + Math.random() * 900000).toString()
-
-        const hashedOTP = await bcrypt.hash(otp, 10)
-
-        user.otp = hashedOTP
-        user.otpExpire = Date.now() + 5 * 60 * 1000
-
-        await user.save()
-
-        await sendEmail(
-            user.email,
-            "Mã OTP đăng nhập",
-            `Mã OTP của bạn là: ${otp}. OTP có hiệu lực trong 5 phút`
-        )
+        // MÔ PHỎNG GỬI SMS: Log ra console (Bạn hãy tích hợp SMS API tại đây)
+        console.log(`[SMS] OTP gửi tới số ${phone}: ${otp}`);
 
         res.status(200).json({
             success: true,
-            message: "OTP đã gửi tới email "
-        })
+            message: "Mã OTP đã được gửi tới số điện thoại của bạn"
+        });
 
     } catch (error) {
-
-        res.status(500).json({
-            success: false,
-            message: error.message
-        })
-
+        res.status(500).json({ success: false, message: error.message });
     }
-
 }
 
-
-
 /* ==============================
-   5. VERIFY OTP LOGIN
+   4. VERIFY OTP (Dùng phone)
 ============================== */
-
 export const verifyOTP = async (req, res) => {
-
     try {
+        const { phone, otp } = req.body;
 
-        const { email, otp } = req.body
-
-        const user = await User.findOne({ email })
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User không tồn tại"
-            })
-        }
-
-        const isValidOTP = await bcrypt.compare(otp, user.otp)
-
-        if (!isValidOTP) {
-            return res.status(400).json({
-                success: false,
-                message: "OTP không chính xác"
-            })
+        const user = await User.findOne({ phone });
+        if (!user || !user.otp) {
+            return res.status(400).json({ success: false, message: "Yêu cầu không hợp lệ" });
         }
 
         if (user.otpExpire < Date.now()) {
-            return res.status(400).json({
-                success: false,
-                message: "OTP đã hết hạn"
-            })
+            return res.status(400).json({ success: false, message: "Mã OTP đã hết hạn" });
         }
 
-        user.otp = undefined
-        user.otpExpire = undefined
+        const isMatch = await bcrypt.compare(otp, user.otp);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Mã OTP không chính xác" });
+        }
 
-        const token = generateToken(user._id)
-        const refreshToken = generateRefreshToken(user._id)
+        user.otp = undefined;
+        user.otpExpire = undefined;
+        await user.save();
 
-        user.refreshToken = refreshToken
-
-        await user.save()
-
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        })
-
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: 30 * 24 * 60 * 60 * 1000
-        })
+        const token = generateToken(user._id);
 
         res.status(200).json({
             success: true,
             message: "Đăng nhập thành công",
-            data: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role
-            }
-        })
-
+            token,
+            user: { id: user._id, name: user.name, phone: user.phone, role: user.role }
+        });
     } catch (error) {
-
-        res.status(500).json({
-            success: false,
-            message: error.message
-        })
-
+        res.status(500).json({ success: false, message: error.message });
     }
-
 }
+
 
 
 

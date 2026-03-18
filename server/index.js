@@ -5,7 +5,7 @@ import connectDB from './src/config/db.js';
 import productRoutes from './src/routes/productRoutes.js';
 import authRoutes from './src/routes/authRoutes.js'; // Import route cho auth
 import cookieParser from "cookie-parser";
-
+import cloudinary from './src/config/cloudinary.js'; // Import cấu hình Cloudinary
 
 
 dotenv.config();

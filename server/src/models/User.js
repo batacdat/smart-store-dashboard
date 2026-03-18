@@ -13,11 +13,10 @@ const userSchema = new mongoose.Schema(
 
     email: {
         type: String,
-        required: [true, "Vui lòng nhập email"],
         unique: true,
+        sparse: true, // Thêm sparse: true để cho phép nhiều user có email là null/undefined
         validate: [validator.isEmail, "Vui lòng nhập đúng định dạng email"],
     },
-
     password: {
         type: String,
         required: [true, "Vui lòng nhập mật khẩu"],

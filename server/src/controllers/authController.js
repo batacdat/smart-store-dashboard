@@ -383,126 +383,82 @@ export const changePassword = async (req, res) => {
 ============================== */
 
 export const forgotPassword = async (req, res) => {
-
     try {
+        const { phone, email } = req.body; // Nhận phone để tìm user, email để gửi mã
 
-        const { email } = req.body
-
-        const user = await User.findOne({ email })
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "Email không tồn tại"
-            })
+        if (!phone || !email) {
+            return res.status(400).json({ success: false, message: "Vui lòng nhập số điện thoại và email nhận mã" });
         }
 
-        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        // 1. Tìm User bằng Số điện thoại
+        const user = await User.findOne({ phone });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Số điện thoại này chưa được đăng ký" });
+        }
 
-        const hashedOTP = await bcrypt.hash(otp, 10)
+        // 2. Tạo OTP và lưu vào User đó
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const salt = await bcrypt.genSalt(10);
+        user.otp = await bcrypt.hash(otp, salt);
+        user.otpExpire = Date.now() + 15 * 60 * 1000; 
+        
+        await user.save();
 
-        user.otp = hashedOTP
-        user.otpExpire = Date.now() + 5 * 60 * 1000
+        // 3. Gửi OTP đến cái email mà người dùng vừa nhập (không cần email đã đăng ký)
+        const message = `Mã OTP khôi phục mật khẩu cho tài khoản ${phone} là: ${otp}`;
+        await sendEmail(email, "Mã xác thực Smart Store", message);
 
-        await user.save()
-
-        await sendEmail(
-            user.email,
-            "OTP khôi phục mật khẩu",
-            `Mã OTP đặt lại mật khẩu của bạn là: ${otp}`
-        )
-
-        res.status(200).json({
-            success: true,
-            message: "OTP reset password đã gửi tới email"
-        })
-
+        res.status(200).json({ success: true, message: "Mã OTP đã được gửi đến email của bạn" });
     } catch (error) {
-
-        res.status(500).json({
-            success: false,
-            message: error.message
-        })
-
+        res.status(500).json({ success: false, message: error.message });
     }
-
-}
+};
  // hàm này kết hợp với hàm forgotPassword để reset password sau khi verify OTP thành công ===========
+// controllers/authController.js
+
+/* ==============================
+   8. RESET PASSWORD
+============================== */
 export const resetPassword = async (req, res) => {
     try {
-        const { email, otp, newPassword, confirmPassword } = req.body
+        const { phone, otp, newPassword } = req.body;
 
-        // 1. Validate
-        if (!email || !otp || !newPassword || !confirmPassword) {
-            return res.status(400).json({
-                success: false,
-                message: "Vui lòng nhập đầy đủ thông tin"
-            })
-        }
-
-        if (newPassword !== confirmPassword) {
-            return res.status(400).json({
-                success: false,
-                message: "Mật khẩu xác nhận không khớp"
-            })
-        }
-
-        // 2. Tìm user
-        const user = await User.findOne({ email })
-
+        const user = await User.findOne({ phone });
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User không tồn tại"
-            })
+            return res.status(404).json({ success: false, message: "Không tìm thấy tài khoản" });
         }
 
-        // 3. Kiểm tra OTP
-        if (!user.otp) {
-            return res.status(400).json({
-                success: false,
-                message: "Chưa yêu cầu OTP"
-            })
+        // 1. Kiểm tra OTP
+        if (!user.otp || user.otpExpire < Date.now()) {
+            return res.status(400).json({ success: false, message: "Mã OTP đã hết hạn" });
         }
 
-        const isValidOTP = await bcrypt.compare(otp, user.otp)
-
+        const isValidOTP = await bcrypt.compare(otp, user.otp);
         if (!isValidOTP) {
-            return res.status(400).json({
-                success: false,
-                message: "OTP không đúng"
-            })
+            return res.status(400).json({ success: false, message: "Mã OTP không đúng" });
         }
 
-        if (user.otpExpire < Date.now()) {
-            return res.status(400).json({
-                success: false,
-                message: "OTP đã hết hạn"
-            })
-        }
+        // 2. Cập nhật mật khẩu mới
+        // Lưu ý: Nếu Model User của bạn đã có middleware pre-save bcrypt thì chỉ cần gán.
+        // Nhưng để chắc chắn và sửa lỗi 401, ta reset refreshToken về null.
+        user.password = newPassword; 
+        
+        // 3. QUAN TRỌNG: Xóa sạch dấu vết phiên cũ và OTP
+        user.otp = undefined;
+        user.otpExpire = undefined;
+        user.refreshToken = null; // Hủy token cũ để tránh lỗi 401 do xung đột phiên
 
-        // 4. Update password
-        user.password = newPassword
-
-        // clear OTP
-        user.otp = undefined
-        user.otpExpire = undefined
-
-        await user.save()
+        await user.save();
 
         res.status(200).json({
             success: true,
-            message: "Đặt lại mật khẩu thành công"
-        })
+            message: "Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại!"
+        });
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        })
+        res.status(500).json({ success: false, message: error.message });
     }
-}
-
+};
 /* ==============================
    9. LOGOUT
 ============================== */

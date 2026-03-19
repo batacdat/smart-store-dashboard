@@ -3,7 +3,7 @@ import { Lock, User, Phone, ArrowRight, Loader2, Store, Eye, EyeOff } from 'luci
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import userImage from '../../assets/anh_bia_dang_nhap.png';
+import userImage from '../../assets/shopping.jpg';
 
 const UserRegisterPage = () => {
   const navigate = useNavigate();
@@ -44,10 +44,10 @@ const UserRegisterPage = () => {
       <div className="w-full max-w-4xl bg-white rounded-[2rem] shadow-xl overflow-hidden flex flex-col md:flex-row border border-white/50">
         <div className="w-full md:w-1/2 p-8 flex flex-col justify-center">
           <div className="mb-6">
-            <div className="flex items-center gap-2 mb-4 text-teal-600 font-black italic text-xl uppercase tracking-tighter">
+            <div className="flex items-center gap-2 mb-4 text-indigo-600 font-black italic text-xl uppercase tracking-tighter">
               <Store size={24} /> ChongThamBaoLinh
             </div>
-            <h2 className="text-2xl font-black text-slate-900">Tạo tài khoản</h2>
+            <h2 className="text-3xl font-black text-slate-800 tracking-tight italic uppercase">Tạo tài khoản</h2>
             <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Đăng ký bằng số điện thoại</p>
           </div>
 
@@ -90,20 +90,20 @@ const UserRegisterPage = () => {
               </div>
             </div>
 
-            <button disabled={loading} className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 mt-4 transition-all">
+            <button disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 mt-4 transition-all">
               {loading ? <Loader2 className="animate-spin" size={18} /> : <><span className="text-xs uppercase tracking-widest">Đăng ký ngay</span><ArrowRight size={16} /></>}
             </button>
           </form>
 
           <div className="mt-4 text-center">
-            <p className="text-[11px] text-slate-400 font-medium">Đã có tài khoản? <Link to="/login" className="text-teal-600 font-black hover:underline">Đăng nhập</Link></p>
+            <p className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Đã có tài khoản? <Link to="/login" className="text-indigo-600 font-black hover:underline">Đăng nhập</Link></p>
           </div>
         </div>
 
         <div className="hidden md:block md:w-1/2 p-3 bg-white">
           <div className="relative h-full w-full rounded-[1.5rem] overflow-hidden group">
             <img src={userImage} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" alt="Register" />
-            <div className="absolute inset-0 bg-gradient-to-tr from-teal-900/40 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/40 to-transparent"></div>
           </div>
         </div>
       </div>

@@ -6,7 +6,7 @@ import productRoutes from './src/routes/productRoutes.js';
 import authRoutes from './src/routes/authRoutes.js'; // Import route cho auth
 import cookieParser from "cookie-parser";
 import cloudinary from './src/config/cloudinary.js'; // Import cấu hình Cloudinary
-
+import contactRoutes from './src/routes/contactRoutes.js'; // Import route cho contact
 
 dotenv.config();
 connectDB();
@@ -33,6 +33,8 @@ app.use(cors({
 // --- ROUTES ---
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes); // Thêm route cho auth
+app.use('/api/contact', contactRoutes);
+
 
 app.get('/', (req, res) => {
   res.send('Server MERN của bạn đã sẵn sàng!');

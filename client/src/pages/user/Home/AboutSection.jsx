@@ -68,7 +68,7 @@ const AboutSection = () => {
       </div>
 
       {/* Phần con số thống kê (Stats) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 py-12 border-t border-slate-100">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 py-12 border-t border-slate-100 bg-oldlace-50 rounded-xl">
         {stats.map((stat, index) => (
           <div key={index} className="text-center space-y-2 group cursor-default">
             <div className="flex justify-center text-3xl transition-transform group-hover:scale-110 duration-300">

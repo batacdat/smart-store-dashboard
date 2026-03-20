@@ -6,14 +6,16 @@ import AdminLoginPage from './pages/auth/AdminLoginPage';
 import UserRegisterPage from './pages/auth/UserRegisterPage';
 import Sidebar from './components/layout/Sidebar';
 import Dashboard from './pages/admin/Dashboard';
-import ProductManagement from './pages/admin/ProductManagement'; // File bạn vừa tạo
-import AddProduct from './pages/admin/AddProduct';
-import EditProduct from './pages/admin/EditProduct';
+import ProductManagement from './pages/admin/Product/ProductManagement'; // File bạn vừa tạo
+import AddProduct from './pages/admin/Product/AddProduct';
+import EditProduct from './pages/admin/Product/EditProduct';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import UserLayout from './components/layout/UserLayout';
 import HomePage from './pages/user/Home/HomePage';
 import ProductDetailPage from './pages/user/ProductDetail/ProductDetailPage';
 import CartPage from './pages/user/Cart/CartPage';
+import CreateBlog from './pages/admin/Blog/CreateBlog';
+import BlogManagement from './pages/admin/Blog/BlogManagement';
 
 
 function App() {
@@ -52,6 +54,8 @@ function App() {
                 <Route path="/admin/product/:id" element={<EditProduct />} />
                 <Route path="/admin/orders" element={<div className="p-8">Quản lý đơn hàng</div>} />
                 <Route path="/admin/returns" element={<div className="p-8">Quản lý trả hàng</div>} />
+                <Route path="/admin/blog" element={<BlogManagement />} />
+                <Route path="/admin/blog/create" element={<CreateBlog />} />
               </Routes>
             </main>
           </div>

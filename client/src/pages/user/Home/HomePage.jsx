@@ -11,9 +11,9 @@ const HomePage = () => {
     <>
       {/* Tối ưu SEO: Giúp Google hiểu nội dung trang chủ */}
       <Helmet>
-        <title>Smart Store - Giải pháp công nghệ hiện đại dẫn đầu xu hướng</title>
-        <meta name="description" content="Khám phá bộ sưu tập thiết kế thông minh, sản phẩm công nghệ đỉnh cao và tin tức mới nhất tại Smart Store." />
-        <meta property="og:title" content="Smart Store - Mua sắm thông minh" />
+        <title>ChongThamBaoLinh - Giải pháp chống thấm hiện đại dẫn đầu xu hướng</title>
+        <meta name="description" content="Khám phá bộ sưu tập thiết kế thông minh, sản phẩm chống thấm hiệu quả và tin tức mới nhất tại ChongThamBaoLinh." />
+        <meta property="og:title" content="ChongThamBaoLinh - Giải pháp chống thấm hiện đại" />
       </Helmet>
 
       <div className="flex flex-col">

@@ -6,7 +6,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 // IMPORT HÀM API TẠI ĐÂY
-import { createProduct } from '../../api/productApi'; 
+import { createProduct } from '../../../api/productApi';
 
 const AddProduct = () => {
   const navigate = useNavigate();

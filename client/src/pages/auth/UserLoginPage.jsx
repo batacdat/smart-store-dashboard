@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import userImage from '../../assets/shopping.jpg';
+import logo from '../../assets/logo-bao-linh.svg';
 
 const UserLoginPage = () => {
   const navigate = useNavigate();
@@ -55,7 +56,8 @@ const UserLoginPage = () => {
         <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-4 text-indigo-600 font-black italic text-xl uppercase tracking-tighter ">
-              <Store size={24} /> ChongThamBaoLinh
+              <img src={logo} alt="Logo" className="h-8" />
+              chongthambaolinh
             </div>
             <h2 className="text-3xl font-black text-slate-800 tracking-tight italic uppercase">Đăng nhập</h2>
             <p className="text-slate-400 text-[11px] font-black uppercase tracking-wider mt-2">Tiếp tục hành trình mua sắm của bạn</p>

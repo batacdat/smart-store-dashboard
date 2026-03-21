@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { FaAcquisitionsIncorporated } from 'react-icons/fa';
+import logo from '../../assets/logo-bao-linh.svg';
+
 
 const MenuItem = ({ icon: Icon, title, to, isCollapsed, active, hasSubmenu, submenuOpen }) => {
   const location = useLocation();

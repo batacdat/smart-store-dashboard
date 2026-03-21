@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, ShoppingBag, User, LogOut } from 'lucide-react'; 
 import { useCart } from '../../contexts/CartContext';
-import LogoBaoLinh from '../../assets/logo-bao-linh.png';
+import LogoBaoLinh from '../../assets/logo-bao-linh.svg';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);

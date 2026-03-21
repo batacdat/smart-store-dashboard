@@ -34,7 +34,7 @@ const BlogSection = () => {
         
         {/* 1. TIÊU ĐỀ ĐÃ CĂN GIỮA */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-sm font-black text-orange-600 uppercase tracking-[0.2em] mb-4">
+          <h2 className="text-sm font-black text-orange-600 uppercase tracking-widest mb-4">
             Tin tức & Sự kiện
           </h2>
           <h3 className="text-3xl md:text-4xl font-black text-slate-900 tracking-wider leading-snug md:leading-relaxed">

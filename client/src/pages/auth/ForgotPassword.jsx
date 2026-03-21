@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 // Đảm bảo đường dẫn ảnh này chính xác trong dự án của bạn
 import userImage from '../../assets/shopping.jpg'; 
+import logo from '../../assets/logo-bao-linh.svg';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -86,7 +87,8 @@ const ForgotPassword = () => {
           <div className="mb-10">
             {/* Icon Store với tông Indigo */}
             <div className="flex items-center gap-2 mb-4 text-indigo-600 font-black italic text-xl uppercase tracking-tighter ">
-              <Store size={24} /> ChongThamBaoLinh
+              <img src={logo} alt="Logo" className="h-8" />
+              chongthambaolinh
             </div>
 
             {/* Tiêu đề chữ lớn, in hoa, nghiêng giống Login */}

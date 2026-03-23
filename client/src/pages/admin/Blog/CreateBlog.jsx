@@ -22,6 +22,7 @@ const CreateBlog = () => {
     category: 'Tin tức',
     status: 'Published', // Mặc định là xuất bản
     thumbnailFile: null, // Lưu file ảnh thực tế để gửi lên server
+    videoUrl: '',
   });
 
   const handleChange = (e) => {
@@ -73,6 +74,7 @@ const CreateBlog = () => {
       data.append('author', formData.author);
       data.append('category', formData.category);
       data.append('status', currentStatus || formData.status);
+      data.append('videoUrl', formData.videoUrl);
       data.append('image', formData.thumbnailFile); // File ảnh
 
       // Gọi API đến Backend
@@ -166,6 +168,17 @@ const CreateBlog = () => {
                   className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-teal-500/10 focus:border-teal-400 outline-none transition-all resize-none text-slate-600 leading-relaxed"
                 ></textarea>
               </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Link Video Youtube (Nếu có)</label>
+                  <input 
+                    type="text"
+                    name="videoUrl"
+                    value={formData.videoUrl}
+                    onChange={handleChange}
+                    placeholder="Ví dụ: https://www.youtube.com/watch?v=..."
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-teal-400"
+                  />
+                </div>
             </div>
 
             {/* Khối Nội dung chi tiết */}
@@ -231,6 +244,7 @@ const CreateBlog = () => {
                   </div>
                 )}
             </div>
+
 
             {/* Khối Thông tin bổ sung */}
             <div className="bg-white p-7 rounded-3xl shadow-sm border border-slate-100 space-y-5">

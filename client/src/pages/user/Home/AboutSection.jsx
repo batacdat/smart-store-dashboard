@@ -7,7 +7,7 @@ const AboutSection = () => {
   const stats = [
     { icon: <Trophy className="text-orange-500" />, label: "Năm kinh nghiệm", value: "10+" },
     { icon: <Users className="text-orange-500" />, label: "Khách hàng tin dùng", value: "5000+" },
-    { icon: <CheckCircle2 className="text-orange-500" />, label: "Dự án hoàn thành", value: "1200+" },
+    { icon: <CheckCircle2 className="text-orange-500" />, label: "Công trình hoàn thành", value: "1200+" },
     { icon: <Lightbulb className="text-orange-500" />, label: "Giải pháp sáng tạo", value: "100%" },
   ];
 
@@ -38,11 +38,11 @@ const AboutSection = () => {
           
           <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight">
             Bảo Linh - Kiến Tạo Giải Pháp <br />
-            <span className="text-orange-600">Công Nghệ Thông Minh</span>
+            <span className="text-orange-600">Chống Thấm Hiệu Quả</span>
           </h2>
 
           <p className="text-lg text-slate-600 leading-relaxed">
-            Tại <strong>Bảo Linh</strong>, chúng tôi không chỉ cung cấp thiết bị, chúng tôi mang đến trải nghiệm sống hoàn toàn mới. Với hơn 10 năm kinh nghiệm, chúng tôi tự hào là đơn vị tiên phong trong việc tích hợp công nghệ vào không gian sống và làm việc.
+            Tại <strong>Bảo Linh</strong>, chúng tôi không chỉ cung cấp vật liệu chống thấm, chúng tôi còn mang đến giải pháp chống thấm hoàn toàn mới. Với hơn 10 năm kinh nghiệm, chúng tôi tự hào là đơn vị tiên phong trong việc tích hợp công nghệ vào không gian sống và làm việc.
           </p>
 
           {/* Danh sách đặc điểm nổi bật */}
@@ -68,7 +68,7 @@ const AboutSection = () => {
       </div>
 
       {/* Phần con số thống kê (Stats) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 py-12 border-t border-slate-100 bg-red-50 rounded-xl w-full">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 py-12 border-t border-slate-100 bg-orange-50 rounded-xl w-full">
         {stats.map((stat, index) => (
           <div key={index} className="text-center space-y-2 group cursor-default">
             <div className="flex justify-center text-3xl transition-transform group-hover:scale-110 duration-300">

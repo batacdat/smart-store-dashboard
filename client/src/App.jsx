@@ -16,6 +16,7 @@ import ProductDetailPage from './pages/user/ProductDetail/ProductDetailPage';
 import CartPage from './pages/user/Cart/CartPage';
 import CreateBlog from './pages/admin/Blog/CreateBlog';
 import BlogManagement from './pages/admin/Blog/BlogManagement';
+import BlogDetailPage from './pages/user/Blog/BlogDetailPage';
 
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
                 <Route path="/admin/returns" element={<div className="p-8">Quản lý trả hàng</div>} />
                 <Route path="/admin/blog" element={<BlogManagement />} />
                 <Route path="/admin/blog/create" element={<CreateBlog />} />
+                
               </Routes>
             </main>
           </div>
@@ -77,6 +79,7 @@ function App() {
               <Route index element={<HomePage />} />
               <Route path="product/:id" element={<ProductDetailPage />} />
               <Route path="cart" element={<CartPage />} />
+              <Route path="/blog/:slug" element={<BlogDetailPage />} />
             </Route>
 
             {/* Điều hướng mặc định */}

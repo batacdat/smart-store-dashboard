@@ -39,7 +39,7 @@ export const getBlogBySlug = async (req, res) => {
 // @route   POST /api/blogs
 export const createBlog = async (req, res) => {
     try {
-        const { title, content, excerpt, category, author, status } = req.body;
+        const { title, content, excerpt, category, author, status, videoUrl } = req.body;
 
         // 1. Kiểm tra xem có file ảnh được gửi lên không
         if (!req.file) {
@@ -77,6 +77,7 @@ export const createBlog = async (req, res) => {
             author,
             category,
             status,
+            videoUrl,
             thumbnail: {
                 url: uploadResponse.secure_url,
                 public_id: uploadResponse.public_id

@@ -30,6 +30,7 @@ const blogSchema = new mongoose.Schema({
     type: Number, 
     default: 0 
   },
+  videoUrl: { type: String, default: "" },
   createdAt: { 
     type: Date, 
     default: Date.now 

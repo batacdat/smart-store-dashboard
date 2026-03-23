@@ -12,7 +12,7 @@ router.route('/')
     .get(getAllBlogs)
     .post(upload.single('image'), createBlog); // 'image' phải khớp với key trong FormData ở Frontend
 
-router.get('/detail/:slug', getBlogBySlug);
+router.get('/:slug', getBlogBySlug);
 router.delete('/:id', deleteBlog);
 
 export default router;

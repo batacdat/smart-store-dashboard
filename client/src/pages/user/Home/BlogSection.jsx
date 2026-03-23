@@ -28,8 +28,7 @@ const BlogSection = () => {
     return <div className="py-20 text-center text-slate-500 font-medium">Đang tải tin tức...</div>;
   }
 
-  return (
-   
+  return (   
       <div className="container mx-auto px-4 max-w-7xl">
         
         {/* 1. TIÊU ĐỀ ĐÃ CĂN GIỮA */}
@@ -112,9 +111,7 @@ const BlogSection = () => {
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
-
       </div>
-
   );
 };
 

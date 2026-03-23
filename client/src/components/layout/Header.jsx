@@ -77,7 +77,7 @@ const Header = () => {
           <Link to="/" className="hover:text-orange-600 transition">Home</Link>
           <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="hover:text-orange-600 transition">About</a>
           <a href="#product" onClick={(e) => handleNavClick(e, 'product')} className="hover:text-orange-600 transition">Product</a>
-          <Link to="/blog" className="hover:text-orange-600 transition">Blog</Link>
+          <a href="#blog" onClick={(e) => handleNavClick(e, 'blog')} className="hover:text-orange-600 transition">Blog</a>
           <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="hover:text-orange-600 transition">Contact</a>
 
           <div className="flex items-center space-x-4 border-l pl-6 border-slate-300">

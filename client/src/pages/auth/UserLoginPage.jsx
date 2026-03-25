@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Lock, ArrowRight, Loader2, Store, EyeOff, Eye, Phone } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -7,12 +7,21 @@ import userImage from '../../assets/shopping.jpg';
 import logo from '../../assets/logo-bao-linh.svg';
 
 const UserLoginPage = () => {
+
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false); 
   const [formData, setFormData] = useState({ phone: '', password: '' });
-
+  
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  
+  useEffect(() => {
+  const user = localStorage.getItem('user');
+  if (user) {
+    navigate('/', { replace: true }); // Nếu đã login thì về trang chủ luôn
+  }
+}, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -32,6 +41,12 @@ const UserLoginPage = () => {
         toast.success("Đăng nhập thành công!");
         localStorage.setItem('token', data.token);
         localStorage.setItem('userInfo', JSON.stringify(data.user));
+        // Sau khi lưu vào localStorage/Cookie thành công
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        // Bắn một sự kiện tùy chỉnh để các component khác biết mà cập nhật
+        window.dispatchEvent(new Event("storage")); 
+
         navigate('/'); 
       }
     } catch (error) {

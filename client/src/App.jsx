@@ -12,11 +12,14 @@ import EditProduct from './pages/admin/Product/EditProduct';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import UserLayout from './components/layout/UserLayout';
 import HomePage from './pages/user/Home/HomePage';
-import ProductDetailPage from './pages/user/ProductDetail/ProductDetailPage';
+import ProductDetailPage from './pages/user/Product/ProductDetailPage';
 import CartPage from './pages/user/Cart/CartPage';
 import CreateBlog from './pages/admin/Blog/CreateBlog';
 import BlogManagement from './pages/admin/Blog/BlogManagement';
 import BlogDetailPage from './pages/user/Blog/BlogDetailPage';
+import ProductListPage from './pages/user/Product/ProductListPage';
+import BlogListPage from './pages/user/Blog/BlogListPage';
+import ProtectedRoute from './components/common/ProtectedRoute';
 
 
 function App() {
@@ -78,11 +81,17 @@ function App() {
             <Route path="/" element={<UserLayout />}>
               <Route index element={<HomePage />} />
               <Route path="product/:id" element={<ProductDetailPage />} />
-              <Route path="cart" element={<CartPage />} />
-              <Route path="/blog/:slug" element={<BlogDetailPage />} />
+              <Route path="products" element={<ProductListPage />} />
+              <Route path="/blog/:slug" element={<BlogDetailPage />} />\
+              <Route path="blog" element={<BlogListPage />} />
+              
             </Route>
-
-            {/* Điều hướng mặc định */}
+            {/* Các trang BẮT BUỘC ĐĂNG NHẬP mới vào được */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/cart" element={<CartPage />} />
+                
+              </Route>
+                        {/* Điều hướng mặc định */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

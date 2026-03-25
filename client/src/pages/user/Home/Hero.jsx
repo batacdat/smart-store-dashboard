@@ -55,8 +55,8 @@ const Hero = () => {
 
           {/* Đoạn mô tả ngắn */}
           <p className="text-white text-xl leading-relaxed font-medium max-w-2xl mx-auto opacity-90">
-            Khám phá các giải pháp chống thấm chất lượng cao: từ màng khò nóng, 
-            sơn gốc nước đến keo chuyên dụng. Bảo Linh Tech - đối tác tin cậy
+            Khám phá các giải pháp chống thấm chất lượng cao: từ màng chống thấm, 
+            keo chống thấm chuyên dụng. CHONGTHAMBAOLINH - đối tác tin cậy
             cho mọi công trình bền vững.
           </p>
 

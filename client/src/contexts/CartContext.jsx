@@ -43,11 +43,11 @@ export const CartProvider = ({ children }) => {
   setCartItems((prevItems) => prevItems.filter((item) => item._id !== productId));
 };
 
-  // 4. Hàm xóa sạch giỏ hàng (Dùng sau khi thanh toán thành công)
-  const clearCart = () => {
-    setCartItems([]);
-  };
 
+const clearCart = () => {
+  setCartItems([]); // Đưa mảng giỏ hàng về rỗng
+  localStorage.removeItem('cart'); // Xóa cả trong bộ nhớ trình duyệt (nếu có dùng)
+};
   return (
     <CartContext.Provider value={{ cartItems, addToCart, updateQuantity, removeFromCart, clearCart }}>
       {children}

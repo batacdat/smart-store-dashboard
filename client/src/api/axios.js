@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+axios.defaults.withCredentials = true;
 const instance = axios.create({
   baseURL: '/api',
   withCredentials: true, // Quan trọng: Để gửi và nhận Cookie từ Backend

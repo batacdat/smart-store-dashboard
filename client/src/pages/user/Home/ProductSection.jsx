@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // 1. Thêm useNavigate
 import axios from 'axios';
-import { ShoppingCart, Eye, Star } from 'lucide-react';
+import { ShoppingCart, Eye, Star, PackageSearch, ArrowRight } from 'lucide-react';
 import { useCart } from '../../../contexts/CartContext';
 
 
@@ -29,9 +29,18 @@ const ProductSection = () => {
   }, []);
 
   // 5. Hàm xử lý khi nhấn vào icon giỏ hàng
-  const handleQuickAddToCart = (product) => {
-    addToCart(product, 1); // Thêm mặc định 1 sản phẩm
-    navigate('/cart');    // Chuyển hướng sang trang giỏ hàng
+const handleQuickAddToCart = (product) => {
+    // THÊM LOGIC KIỂM TRA LOGIN
+    const savedUser = localStorage.getItem('user');
+    
+    if (!savedUser) {
+      navigate('/login');
+      return;
+    }
+
+    // Nếu đã login thì mới thực hiện logic cũ
+    addToCart(product, 1);
+    navigate('/cart');
   };
 
   if (loading) {
@@ -102,6 +111,20 @@ const ProductSection = () => {
           </div>
         )}
       </div>
+        {/* --- NÚT XEM TẤT CẢ (MỚI THÊM) --- */}
+        <div className="mt-16 flex justify-center">
+          <Link 
+            to="/products" // Đường dẫn tới trang ProductList của bạn
+            className="group relative flex items-center gap-4 bg-white   text-black px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all duration-300 shadow-xl shadow-slate-200 active:scale-95"
+          >
+            <div className="absolute -inset-1 bg-orange-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity"></div>
+            
+            <PackageSearch size={20} className="text-orange-400 group-hover:text-white transition-colors" />
+            <span>Xem tất cả sản phẩm</span>
+            <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-300" />
+          </Link>
+        </div>
+        {/* ------------------------------- */}
     </div>
   );
 };

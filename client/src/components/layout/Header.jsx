@@ -19,19 +19,19 @@ const Header = () => {
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   // Theo dõi trạng thái đăng nhập
-  useEffect(() => {
-    const checkAuth = () => {
-      const savedUser = localStorage.getItem('user');
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
-      } else {
-        setUser(null);
-      }
-    };
+useEffect(() => {
+  const checkAuth = () => {
+    const savedUser = localStorage.getItem('user');
+    setUser(savedUser ? JSON.parse(savedUser) : null);
+  };
 
-    checkAuth();
-    // Lắng nghe sự kiện thay đổi route để cập nhật lại trạng thái user
-  }, [location.pathname]); 
+  checkAuth();
+  
+  // Lắng nghe sự kiện thay đổi storage
+  window.addEventListener('storage', checkAuth);
+  return () => window.removeEventListener('storage', checkAuth);
+}, [location.pathname]); // Chạy lại khi đổi trang hoặc khi có sự kiện storage
+
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -44,7 +44,7 @@ const Header = () => {
     localStorage.removeItem('token');
     setUser(null);
     setIsUserMenuOpen(false);
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   const handleNavClick = (e, targetId) => {

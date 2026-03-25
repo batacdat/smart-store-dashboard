@@ -15,12 +15,30 @@ const ProductDetailPage = () => {
 
   const navigate = useNavigate();
 
+const handleAddToCart = () => {
+    // THÊM LOGIC KIỂM TRA LOGIN
+    const savedUser = localStorage.getItem('user');
+    
+    if (!savedUser) {
+      navigate('/login');
+      return;
+    }
 
-  const handleAddToCart = () => {
+    // Nếu đã login thì thực hiện logic cũ
     addToCart(product, quantity);
     navigate('/cart');
   };
 
+  // Tìm đến nút "Mua ngay" (thường chưa có logic) bạn có thể thêm tương tự:
+  const handleBuyNow = () => {
+    const savedUser = localStorage.getItem('user');
+    if (!savedUser) {
+      navigate('/login');
+      return;
+    }
+    addToCart(product, quantity);
+    navigate('/cart');
+  };
 
 
   useEffect(() => {
@@ -102,7 +120,7 @@ const ProductDetailPage = () => {
               <button onClick={handleAddToCart} className="flex-1 bg-slate-900 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all active:scale-95 shadow-xl">
                 <ShoppingCart size={20} /> Thêm vào giỏ hàng
               </button>
-              <button className="flex-1 bg-orange-600 text-white py-4 rounded-xl font-bold hover:bg-orange-700 transition-all active:scale-95 shadow-lg shadow-orange-200">
+              <button onClick={handleBuyNow} className="flex-1 bg-orange-600 text-white py-4 rounded-xl font-bold hover:bg-orange-700 transition-all active:scale-95 shadow-lg shadow-orange-200">
                 Mua ngay
               </button>
             </div>

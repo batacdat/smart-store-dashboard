@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaFacebook, FaInstagram, FaTwitter, FaYoutube, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaTwitter, FaYoutube, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaTiktok } from 'react-icons/fa';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -18,9 +18,9 @@ const Footer = () => {
             </p>
             <div className="flex space-x-4 text-xl">
               <a href="#" className="hover:text-orange-500 transition"><FaFacebook /></a>
-              <a href="#" className="hover:text-orange-500 transition"><FaInstagram /></a>
+              <a href="https://www.tiktok.com/@xaydunghanoi88.vn" target="_blank" rel="noopener noreferrer" className="hover:text-orange-500 transition"><FaTiktok /></a>
               <a href="#" className="hover:text-orange-500 transition"><FaTwitter /></a>
-              <a href="#" className="hover:text-orange-500 transition"><FaYoutube /></a>
+              <a href="https://www.youtube.com/@khavu3707" target="_blank" rel="noopener noreferrer" className="hover:text-orange-500 transition"><FaYoutube /></a>
             </div>
           </div>
 
@@ -60,7 +60,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center space-x-3">
                 <FaEnvelope className="text-orange-500" />
-                <span>support@smartstore.com</span>
+                <span>support@baolinh.com</span>
               </li>
             </ul>
           </div>
@@ -70,7 +70,7 @@ const Footer = () => {
 
         {/* Bản quyền và Pháp lý */}
         <div className="flex flex-col md:flex-row justify-between items-center text-xs space-y-4 md:space-y-0">
-          <p>© {currentYear} Smart Store. All rights reserved.</p>
+          <p>© {currentYear} CHONGTHAMBAOLINH. All rights reserved.</p>
           <div className="flex space-x-6">
             <a href="#" className="hover:text-white">Privacy Policy</a>
             <a href="#" className="hover:text-white">Terms of Service</a>

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-
+/* Chỉ giữ lại các custom animations của bạn, xóa bỏ phần khai báo font ở đây */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

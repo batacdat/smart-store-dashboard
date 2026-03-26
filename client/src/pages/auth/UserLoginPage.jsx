@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Lock, ArrowRight, Loader2, Store, EyeOff, Eye, Phone } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import axios from '../../api/axios';
 import userImage from '../../assets/shopping.jpg';
 import logo from '../../assets/logo-bao-linh.svg';
 
@@ -31,7 +31,7 @@ const UserLoginPage = () => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post('/api/auth/login', { 
+      const { data } = await axios.post('/auth/login', { 
         phone: formData.phone, 
         password: formData.password,
         isAdminPortal: false 
@@ -39,8 +39,7 @@ const UserLoginPage = () => {
 
       if (data.success) {
         toast.success("Đăng nhập thành công!");
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('userInfo', JSON.stringify(data.user));
+
         // Sau khi lưu vào localStorage/Cookie thành công
         localStorage.setItem('user', JSON.stringify(data.user));
 

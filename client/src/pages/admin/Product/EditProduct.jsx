@@ -5,7 +5,9 @@ import {
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import { updateProduct } from '../../../api/productApi';
+
+ import axios from '../../../api/axios';
 
 const EditProduct = () => {
   const { id } = useParams(); // Lấy ID sản phẩm từ URL
@@ -30,37 +32,64 @@ const EditProduct = () => {
   const categories = ["Keo chống thấm", "Màng chống thấm", "Sơn chống thấm", "Khác"];
 
   // 1. Lấy dữ liệu sản phẩm hiện tại khi vừa load trang
-  useEffect(() => {
+useEffect(() => {
     const fetchProduct = async () => {
-      try {
-        const { data } = await axios.get(`/api/products/${id}`);
-        if (data.success) {
-          const product = data.data;
-          setFormData({
-            name: product.name,
-            description: product.description,
-            price: product.price,
-            category: product.category,
-            stock: product.stock,
-            isFeatured: product.isFeatured,
-            images: [] // Để trống mảng file mới
-          });
-          // Lưu URL ảnh cũ vào previews để hiển thị
-          if (product.images && Array.isArray(product.images)) {
-            setPreviews(product.images.map(img => img.url));
-            } else {
-            setPreviews([]);
+        try {
+           console.log('Đang gọi API:', `/products/${id}`);
+            const { data } = await axios.get(`/products/${id}`);
+             console.log('Response từ server:', data);
+            if (data.success) {
+                const p = data.data;
+                setFormData({
+                    name: p.name,
+                    description: p.description,
+                    price: p.price,
+                    category: p.category,
+                    stock: p.stock,
+                    isFeatured: p.isFeatured,
+                    images: [] // images chỉ chứa file mới để upload
+                });
+                // previews chứa các link ảnh cũ để hiển thị
+                setPreviews(p.images.map(img => img.url || img));
             }
+        } catch (error) {
+          console.error('Server trả về success = false:', error.response?.data?.message);
+            toast.error("Không thể tải dữ liệu sản phẩm");
+        } finally {
+            setFetching(false);
         }
-      } catch (error) {
-        toast.error("Không tìm thấy sản phẩm hoặc lỗi kết nối");
-        navigate('/admin/products');
-      } finally {
-        setFetching(false);
-      }
     };
     fetchProduct();
-  }, [id, navigate]);
+}, [id]);
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+        const data = new FormData();
+        data.append('name', formData.name);
+        data.append('description', formData.description);
+        data.append('price', formData.price);
+        data.append('category', formData.category);
+        data.append('stock', formData.stock);
+        data.append('isFeatured', formData.isFeatured);
+
+        // Chỉ gửi những file ảnh mới được chọn thêm
+        formData.images.forEach(file => data.append('images', file));
+
+        // Dùng hàm updateProduct đã đồng bộ Cookie
+        const response = await updateProduct(id, data);
+
+        if (response.data.success) {
+            toast.success("Cập nhật thành công!");
+            navigate('/admin/products');
+        }
+    } catch (error) {
+        toast.error(error.response?.data?.message || "Lỗi cập nhật");
+    } finally {
+        setLoading(false);
+    }
+};
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -88,38 +117,7 @@ const EditProduct = () => {
     setFormData(prev => ({ ...prev, images: updatedImages }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
 
-    const myForm = new FormData();
-    myForm.append('name', formData.name);
-    myForm.append('description', formData.description);
-    myForm.append('price', formData.price);
-    myForm.append('category', formData.category);
-    myForm.append('stock', formData.stock);
-    myForm.append('isFeatured', formData.isFeatured);
-
-    // Chỉ gửi ảnh lên nếu có chọn ảnh mới (Backend đã có logic giữ ảnh cũ nếu req.files rỗng)
-    formData.images.forEach(image => {
-      myForm.append('images', image);
-    });
-
-    try {
-      const { data } = await axios.put(`/api/products/${id}`, myForm, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-
-      if (data.success) {
-        toast.success("Cập nhật sản phẩm thành công!");
-        navigate('/admin/products');
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Cập nhật thất bại");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (fetching) {
     return (

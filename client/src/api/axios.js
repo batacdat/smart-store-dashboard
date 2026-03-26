@@ -1,24 +1,34 @@
 import axios from 'axios';
-axios.defaults.withCredentials = true;
+
 const instance = axios.create({
   baseURL: '/api',
-  withCredentials: true, // Quan trọng: Để gửi và nhận Cookie từ Backend
+  withCredentials: true, // ✅ Quan trọng: gửi cookie tự động
 });
 
-// Use Case: Làm mới Token tự động
+// ❌ KHÔNG thêm token vào header khi dùng cookie
+instance.interceptors.request.use(
+  (config) => {
+    console.log(`📤 ${config.method.toUpperCase()} ${config.url}`);
+    // Không thêm Authorization header vì đã dùng cookie
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor xử lý refresh token
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    // Nếu lỗi 401 (Hết hạn Access Token) và chưa thử refresh
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        await axios.get('/auth/refresh-token', { withCredentials: true });
-        
-        return instance(originalRequest); // Gửi lại request ban đầu
+        // Cookie sẽ tự động được gửi trong request này
+        await instance.get('/auth/refresh-token');
+        return instance(originalRequest);
       } catch (refreshError) {
-        window.location.href = '/login'; // Refresh lỗi thì bắt login lại
+        console.error('Refresh token failed');
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);

@@ -10,7 +10,8 @@ import {
     forgotPassword,
     logout,
     resetPassword,
-    login
+    login,
+   getAllUsers
 } from "../controllers/authController.js";
 
 import {
@@ -76,7 +77,7 @@ LOGOUT
 
 // logout
 router.post("/logout", protect, logout);
-
+router.get("/", getAllUsers);
 
 
 export default router;

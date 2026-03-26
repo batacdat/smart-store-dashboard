@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import cloudinary from './src/config/cloudinary.js'; // Import cấu hình Cloudinary
 import contactRoutes from './src/routes/contactRoutes.js'; // Import route cho contact
 import blogRoutes from './src/routes/blogRoutes.js'; // Import route cho blog
+import orderRoutes from './src/routes/orderRoutes.js'; // Import route cho order
 
 
 dotenv.config();
@@ -16,12 +17,6 @@ connectDB();
 const app = express();
 
 // --- MIDDLEWARES (Phải đặt trước Routes) ---
-app.use(cors()); // Cho phép gọi API từ bên ngoài
-app.use(express.json()); // Giải mã JSON request body
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-
 // Phải đặt trước các định nghĩa Route
 app.use(cors({
     origin: 'http://localhost:5173', // Địa chỉ của Frontend (Vite)
@@ -29,6 +24,12 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+app.use(express.json()); // Giải mã JSON request body
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+
 
 
 
@@ -38,6 +39,8 @@ app.use('/api/auth', authRoutes); // Thêm route cho auth
 app.use('/api/contact', contactRoutes);
 
 app.use('/api/blogs', blogRoutes);
+app.use('/api/orders', orderRoutes);
+
 app.get('/', (req, res) => {
   res.send('Server MERN của bạn đã sẵn sàng!');
 });

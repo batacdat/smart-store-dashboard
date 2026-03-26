@@ -1,18 +1,18 @@
-import axios from 'axios';
+import api from '../api/axios';
 
-const API = axios.create({
-    // Nếu vite.config.js đã cấu hình proxy cho /api, bạn chỉ cần để như sau:
-    baseURL: '/api', 
-    withCredentials: true 
-});
+export const updateProduct = (id, formData) => {
+  console.log('Updating product with cookie auth');
+  return api.put(`/products/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    // withCredentials đã được cấu hình trong axios instance
+  });
+};
 
-// Khớp với router.route('/').post(...) trong productRoutes.js của bạn
-export const createProduct = (formData) => API.post('/products', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-});
+export const createProduct = (formData) => {
+  return api.post('/products', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};
 
-export const getAllProducts = () => API.get('/products');
-export const deleteProduct = (id) => API.delete(`/products/${id}`);
-export const updateProduct = (id, formData) => API.put(`/products/${id}`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-});
+export const getAllProducts = () => api.get('/products');
+export const deleteProduct = (id) => api.delete(`/products/${id}`);

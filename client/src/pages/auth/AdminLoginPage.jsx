@@ -34,22 +34,32 @@ const AdminLoginPage = () => {
     }
   };
 
-  const handleVerifyOTP = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const { data } = await axios.post('/auth/verify-otp', { email: formData.email, otp: formData.otp });
-      if (data.success) {
-        toast.success("Xác thực quản trị viên thành công!");
-        navigate('/admin/dashboard');
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "OTP không chính xác");
-    } finally {
-      setLoading(false);
+const handleVerifyOTP = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  try {
+    const { data } = await axios.post('/auth/verify-otp', { 
+      email: formData.email, 
+      otp: formData.otp 
+    });
+    
+    if (data.success) {
+      // ❌ KHÔNG lưu token vào localStorage
+      // localStorage.setItem('token', data.token);
+      
+      // Chỉ lưu thông tin user (không có token)
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      toast.success("Xác thực quản trị viên thành công!");
+      navigate('/admin/dashboard');
     }
-  };
-
+  } catch (error) {
+    console.error('Login error:', error.response?.data);
+    toast.error(error.response?.data?.message || "OTP không chính xác");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-transparent">
       {/* THẺ CARD CHÍNH - Thu gọn max-w-4xl và max-h-90vh */}

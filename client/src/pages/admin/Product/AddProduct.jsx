@@ -49,38 +49,54 @@ const AddProduct = () => {
     setPreviews(updatedPreviews);
   };
 
- const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
-  if (formData.images.length === 0) return toast.error("Vui lòng chọn ảnh");
+  
+  if (formData.images.length === 0) {
+    return toast.error("Vui lòng chọn ít nhất một hình ảnh");
+  }
+
 
   setLoading(true);
-  const myForm = new FormData();
-  
-  // Thêm các trường text
-  myForm.append('name', formData.name);
-  myForm.append('description', formData.description);
-  myForm.append('price', formData.price);
-  myForm.append('category', formData.category);
-  myForm.append('stock', formData.stock);
-
-  // Quan trọng: Tên key phải là 'images' trùng với upload.array('images') ở Backend
-  formData.images.forEach((file) => {
-    myForm.append('images', file); 
-  });
-
   try {
-    const { data } = await createProduct(myForm);
-    if (data.success) {
-      toast.success("Thành công!");
-      navigate('/admin/products');
+    const data = new FormData();
+    data.append('name', formData.name);
+    data.append('description', formData.description);
+    // Đảm bảo price là number (không có dấu phẩy, không có ký tự đặc biệt)
+    data.append('price', Number(formData.price));
+    data.append('category', formData.category);
+    data.append('stock', Number(formData.stock));
+    data.append('isFeatured', formData.isFeatured ? 'true' : 'false');
+
+    // Log từng file
+    formData.images.forEach((file) => {
+  
+      data.append('images', file);
+    });
+
+  
+
+
+    const response = await createProduct(data);
+    
+
+    if (response.data.success) {
+      toast.success("Thêm sản phẩm thành công!");
+      setFormData({
+        name: '', description: '', price: '',
+        category: '', stock: 0, isFeatured: false, images: []
+      });
+      setPreviews([]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   } catch (error) {
-    toast.error(error.response?.data?.message || "Lỗi gửi dữ liệu");
+
+    toast.error(error.response?.data?.message || "Lỗi khi gửi dữ liệu");
+    if (error.response?.status === 401) navigate('/login');
   } finally {
     setLoading(false);
   }
 };
-
   return (
     <div className="p-4 md:p-8 w-full bg-slate-50 min-h-screen">
       {/* Header */}

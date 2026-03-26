@@ -4,24 +4,23 @@ import {
   Save, ArrowLeft, Image as ImageIcon, Type, Layout, 
   User, Send, UploadCloud, X, FileText, Zap 
 } from 'lucide-react';
-import axios from 'axios';
+import axios from '../../../api/axios';
+import toast from 'react-hot-toast'; // Thêm toast cho thông báo đẹp hơn
 
 const CreateBlog = () => {
   const navigate = useNavigate();
-  const fileInputRef = useRef(null); // Ref để trigger chọn file
+  const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
-  
-  // State quản lý ảnh xem trước
   const [imagePreview, setImagePreview] = useState(null);
 
   const [formData, setFormData] = useState({
     title: '',
-    excerpt: '', // Thêm trường tóm tắt ngắn
+    excerpt: '',
     content: '',
-    author: 'Bảo Linh Tech', // Có thể lấy từ AuthContext
+    author: 'Bảo Linh Tech',
     category: 'Tin tức',
-    status: 'Published', // Mặc định là xuất bản
-    thumbnailFile: null, // Lưu file ảnh thực tế để gửi lên server
+    status: 'Published',
+    thumbnailFile: null,
     videoUrl: '',
   });
 
@@ -29,14 +28,22 @@ const CreateBlog = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Xử lý khi chọn file ảnh
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // Giới hạn 5MB
-        alert("File ảnh quá lớn. Vui lòng chọn file dưới 5MB.");
+      // Kiểm tra kích thước file
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File ảnh quá lớn. Vui lòng chọn file dưới 5MB.");
         return;
       }
+      
+      // Kiểm tra định dạng file
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Chỉ chấp nhận file ảnh định dạng JPEG, PNG, WEBP");
+        return;
+      }
+      
       setFormData({ ...formData, thumbnailFile: file });
       
       // Tạo URL xem trước
@@ -48,48 +55,126 @@ const CreateBlog = () => {
     }
   };
 
-  // Xóa ảnh đã chọn
   const removeImage = () => {
     setFormData({ ...formData, thumbnailFile: null });
     setImagePreview(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ''; // Reset input file
+      fileInputRef.current.value = '';
     }
+  };
+
+  // Hàm validate dữ liệu
+  const validateForm = () => {
+    if (!formData.title.trim()) {
+      toast.error("Vui lòng nhập tiêu đề bài viết");
+      return false;
+    }
+    
+    if (!formData.content.trim()) {
+      toast.error("Vui lòng nhập nội dung bài viết");
+      return false;
+    }
+    
+    if (!formData.thumbnailFile) {
+      toast.error("Vui lòng chọn ảnh đại diện cho bài viết");
+      return false;
+    }
+    
+    if (formData.title.length < 10) {
+      toast.error("Tiêu đề quá ngắn (tối thiểu 10 ký tự)");
+      return false;
+    }
+    
+    return true;
   };
 
   const handleSubmit = async (e, currentStatus) => {
     e.preventDefault();
-    if(!formData.thumbnailFile) {
-        alert("Vui lòng chọn ảnh đại diện cho bài viết.");
-        return;
+    
+    // Validate dữ liệu
+    if (!validateForm()) {
+      return;
     }
+    
     setLoading(true);
+    
+    // Hiển thị thông báo đang xử lý
+    const loadingToast = toast.loading("Đang xử lý...");
 
     try {
-      // Vì có gửi file, ta phải dùng FormData thay vì JSON thông thường
       const data = new FormData();
-      data.append('title', formData.title);
-      data.append('excerpt', formData.excerpt);
-      data.append('content', formData.content);
-      data.append('author', formData.author);
+      data.append('title', formData.title.trim());
+      data.append('excerpt', formData.excerpt.trim());
+      data.append('content', formData.content.trim());
+      data.append('author', formData.author.trim());
       data.append('category', formData.category);
       data.append('status', currentStatus || formData.status);
-      data.append('videoUrl', formData.videoUrl);
-      data.append('image', formData.thumbnailFile); // File ảnh
+      data.append('videoUrl', formData.videoUrl.trim());
+      data.append('image', formData.thumbnailFile);
 
-      // Gọi API đến Backend
-      const response = await axios.post('/api/blogs', data, {
+      // Log để debug
+      console.log('📤 Sending blog data:');
+      for (let pair of data.entries()) {
+        if (pair[1] instanceof File) {
+          console.log(`${pair[0]}: [File] ${pair[1].name} (${(pair[1].size / 1024).toFixed(2)} KB)`);
+        } else {
+          console.log(`${pair[0]}: ${pair[1]}`);
+        }
+      }
+
+      // SỬA: Bỏ '/api' vì axios đã có baseURL
+      const response = await axios.post('/blogs', data, {
         headers: {
-          'Content-Type': 'multipart/form-data' // Bắt buộc khi gửi file
+          'Content-Type': 'multipart/form-data'
         }
       });
       
+      console.log('✅ Response:', response.data);
+      
       if (response.data.success) {
-        alert("Đăng bài viết thành công!");
-        navigate('/admin/blog'); // Chuyển về danh sách quản lý blog
+        toast.success("Đăng bài viết thành công!", { id: loadingToast });
+        
+        // Reset form sau khi thành công
+        setFormData({
+          title: '',
+          excerpt: '',
+          content: '',
+          author: 'Bảo Linh Tech',
+          category: 'Tin tức',
+          status: 'Published',
+          thumbnailFile: null,
+          videoUrl: '',
+        });
+        setImagePreview(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        
+        // Chuyển về danh sách blog sau 1.5s
+        setTimeout(() => {
+          navigate('/admin/blog');
+        }, 1500);
+      } else {
+        toast.error(response.data.message || "Đăng bài thất bại", { id: loadingToast });
       }
     } catch (error) {
-      alert(error.response?.data?.message || "Có lỗi xảy ra khi đăng bài.");
+      console.error('❌ Error details:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      
+      // Xử lý lỗi chi tiết
+      if (error.response?.status === 400) {
+        toast.error(error.response.data?.message || "Dữ liệu không hợp lệ", { id: loadingToast });
+      } else if (error.response?.status === 401) {
+        toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại", { id: loadingToast });
+        setTimeout(() => navigate('/login'), 1500);
+      } else if (error.response?.status === 413) {
+        toast.error("File quá lớn, vui lòng chọn file nhỏ hơn", { id: loadingToast });
+      } else {
+        toast.error(error.response?.data?.message || "Có lỗi xảy ra khi đăng bài", { id: loadingToast });
+      }
     } finally {
       setLoading(false);
     }
@@ -99,7 +184,7 @@ const CreateBlog = () => {
     <div className="min-h-screen bg-slate-50/50 pt-24 pb-16">
       <div className="container mx-auto px-4 max-w-7xl">
         
-        {/* HEADER SECTION (Giống AddProduct) */}
+        {/* HEADER SECTION */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pb-6 border-b border-slate-100">
           <div className="flex items-center gap-4">
             <button 
@@ -118,7 +203,8 @@ const CreateBlog = () => {
               <button 
                 type="button"
                 onClick={(e) => handleSubmit(e, 'Draft')}
-                className="px-6 py-3 bg-white text-slate-600 rounded-xl font-bold border border-slate-200 hover:bg-slate-50 transition-all text-sm flex items-center gap-2"
+                disabled={loading}
+                className="px-6 py-3 bg-white text-slate-600 rounded-xl font-bold border border-slate-200 hover:bg-slate-50 transition-all text-sm flex items-center gap-2 disabled:opacity-50"
               >
                  <FileText size={16}/> Lưu nháp
               </button>
@@ -126,16 +212,23 @@ const CreateBlog = () => {
                 type="button"
                 onClick={(e) => handleSubmit(e, 'Published')}
                 disabled={loading}
-                className="px-6 py-3 bg-teal-600 text-white rounded-xl font-black hover:bg-teal-700 transition-all shadow-lg shadow-teal-100 active:scale-95 disabled:bg-slate-400 text-sm flex items-center gap-2"
+                className="px-6 py-3 bg-teal-600 text-white rounded-xl font-black hover:bg-teal-700 transition-all shadow-lg shadow-teal-100 active:scale-95 disabled:opacity-50 text-sm flex items-center gap-2"
               >
-                {loading ? "Đang xử lý..." : <><Zap size={16}/> Xuất bản ngay</>}
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    Đang xử lý...
+                  </>
+                ) : (
+                  <><Zap size={16}/> Xuất bản ngay</>
+                )}
               </button>
           </div>
         </div>
 
         <form className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* CỘT TRÁI: NỘI DUNG CHÍNH (Chiếm 2/3) */}
+          {/* CỘT TRÁI: NỘI DUNG CHÍNH */}
           <div className="lg:col-span-2 space-y-8">
             
             {/* Khối Tiêu đề & Tóm tắt */}
@@ -153,6 +246,9 @@ const CreateBlog = () => {
                   placeholder="Nhập tiêu đề hấp dẫn, thu hút người đọc..."
                   className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-teal-500/10 focus:border-teal-400 outline-none transition-all font-extrabold text-xl tracking-tight"
                 />
+                <p className="text-xs text-slate-400 mt-1">
+                  {formData.title.length}/200 ký tự
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -168,17 +264,18 @@ const CreateBlog = () => {
                   className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-teal-500/10 focus:border-teal-400 outline-none transition-all resize-none text-slate-600 leading-relaxed"
                 ></textarea>
               </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Link Video Youtube (Nếu có)</label>
-                  <input 
-                    type="text"
-                    name="videoUrl"
-                    value={formData.videoUrl}
-                    onChange={handleChange}
-                    placeholder="Ví dụ: https://www.youtube.com/watch?v=..."
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-teal-400"
-                  />
-                </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Link Video Youtube (Nếu có)</label>
+                <input 
+                  type="url"
+                  name="videoUrl"
+                  value={formData.videoUrl}
+                  onChange={handleChange}
+                  placeholder="Ví dụ: https://www.youtube.com/watch?v=..."
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-teal-400"
+                />
+              </div>
             </div>
 
             {/* Khối Nội dung chi tiết */}
@@ -186,7 +283,6 @@ const CreateBlog = () => {
               <label className="flex items-center gap-2.5 text-sm font-bold text-slate-700 mb-2">
                 <Layout size={17} className="text-teal-500" /> Nội dung chi tiết bài viết <span className="text-red-500">*</span>
               </label>
-              {/* Sau này nên thay textarea bằng Rich Text Editor như ReactQuill */}
               <textarea 
                 name="content"
                 required
@@ -194,30 +290,29 @@ const CreateBlog = () => {
                 value={formData.content}
                 onChange={handleChange}
                 placeholder="Bắt đầu viết nội dung tuyệt vời của bạn ở đây..."
-                className="w-full px-6 py-5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-teal-500/10 focus:border-teal-400 outline-none transition-all resize-none leading-relaxed"
+                className="w-full px-6 py-5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-teal-500/10 focus:border-teal-400 outline-none transition-all resize-none leading-relaxed font-mono"
               ></textarea>
             </div>
           </div>
 
-          {/* CỘT PHẢI: THIẾT LẬP PHỤ (Chiếm 1/3) */}
+          {/* CỘT PHẢI: THIẾT LẬP PHỤ */}
           <div className="space-y-8 sticky top-28 h-fit">
             
-            {/* Khối Tải ảnh đại diện (NÂNG CẤP MỚI) */}
+            {/* Khối Tải ảnh đại diện */}
             <div className="bg-white p-7 rounded-3xl shadow-sm border border-slate-100">
                 <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-4">
-                  <ImageIcon size={17} className="text-teal-500" /> Ảnh đại diện bài viết (Thumbnail)
+                  <ImageIcon size={17} className="text-teal-500" /> Ảnh đại diện bài viết <span className="text-red-500">*</span>
                 </label>
                 
                 <input 
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
                   ref={fileInputRef}
                   onChange={handleFileChange}
-                  className="hidden" // Giấu input file mặc định
+                  className="hidden"
                 />
 
                 {imagePreview ? (
-                  // Giao diện khi đã chọn ảnh
                   <div className="relative rounded-2xl overflow-hidden border-2 border-slate-100 aspect-[16/10] shadow-inner bg-slate-50">
                     <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                     <button 
@@ -229,22 +324,20 @@ const CreateBlog = () => {
                     </button>
                   </div>
                 ) : (
-                  // Giao diện khi chưa chọn ảnh (Khu vực Drag & Drop)
                   <div 
                     onClick={() => fileInputRef.current.click()}
                     className="border-2 border-dashed border-slate-200 rounded-2xl aspect-[16/10] flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-teal-400 hover:bg-teal-50/50 transition-all text-slate-500 hover:text-teal-600"
                   >
-                    <div className="p-4 bg-slate-100 rounded-full text-slate-400 group-hover:bg-teal-100 transition">
+                    <div className="p-4 bg-slate-100 rounded-full">
                        <UploadCloud size={28} />
                     </div>
                     <div className="text-center px-4">
                         <p className="font-bold text-sm">Nhấn để tải ảnh</p>
-                        <p className="text-xs opacity-70 mt-1">hoặc kéo thả file vào đây (Max 5MB)</p>
+                        <p className="text-xs opacity-70 mt-1">JPEG, PNG, WEBP (Max 5MB)</p>
                     </div>
                   </div>
                 )}
             </div>
-
 
             {/* Khối Thông tin bổ sung */}
             <div className="bg-white p-7 rounded-3xl shadow-sm border border-slate-100 space-y-5">

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle2, Trophy, Users, Lightbulb } from 'lucide-react';
 // Bạn có thể thay ảnh này bằng ảnh thực tế của văn phòng hoặc đội ngũ Bảo Linh
-const ABOUT_IMAGE = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80";
+import ABOUT_IMAGE from "../../../assets/about.jpg";
 
 const AboutSection = () => {
   const stats = [

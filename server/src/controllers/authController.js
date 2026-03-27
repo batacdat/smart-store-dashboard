@@ -156,21 +156,43 @@ export const login = async (req, res) => {
 
         // 5. Phân luồng xử lý
         if (user.role === 'admin' && isAdminPortal) {
-            // Luồng Admin: Yêu cầu bước OTP (không trả token ở đây)
-            // Chúng ta sẽ gọi hàm sendOTP bên dưới thông qua logic Frontend hoặc gọi nội bộ
+            // Luồng Admin: Yêu cầu bước OTP (không set cookie ở đây)
             return res.status(200).json({
                 success: true,
                 requiresOTP: true,
                 message: "Thông tin hợp lệ, vui lòng kiểm tra email nhận mã OTP"
             });
         } else {
-            // Luồng Customer: Đăng nhập thành công ngay lập tức
+            // Luồng Customer: Đăng nhập thành công - SET COOKIE
             const token = generateToken(user._id);
+            const refreshToken = generateRefreshToken(user._id);
+            
+            // ✅ Lưu refreshToken vào database
+            user.refreshToken = refreshToken;
+            await user.save();
+            
+            // ✅ SET COOKIE token (access token)
+            res.cookie('token', token, {
+                httpOnly: true,           // Không cho JS truy cập
+                secure: process.env.NODE_ENV === 'production', // true nếu dùng HTTPS
+                sameSite: 'lax',          // Chống CSRF
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 ngày
+            });
+            
+            // ✅ SET COOKIE refreshToken
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 30 * 24 * 60 * 60 * 1000 // 30 ngày
+            });
+            
+            // Trả về response (không cần trả token vì đã ở trong cookie)
             res.status(200).json({ 
                 success: true, 
-                token, 
+                message: "Đăng nhập thành công",
                 user: {
-                    id: user._id,
+                    _id: user._id,
                     name: user.name,
                     phone: user.phone,
                     role: user.role
@@ -178,10 +200,10 @@ export const login = async (req, res) => {
             });
         }
     } catch (error) {
+        console.error('Login error:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
 
 /* ==============================
    3. SEND OTP (Đăng nhập bằng Email cho Admin)
@@ -254,22 +276,44 @@ export const verifyOTP = async (req, res) => {
 
         user.otp = undefined;
         user.otpExpire = undefined;
-        await user.save();
-
+        
         const token = generateToken(user._id);
+        const refreshToken = generateRefreshToken(user._id);
+        
+        // ✅ Lưu refreshToken vào database
+        user.refreshToken = refreshToken;
+        await user.save();
+        
+        // ✅ SET COOKIE token (access token)
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+        
+        // ✅ SET COOKIE refreshToken
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
 
         res.status(200).json({
             success: true,
             message: "Đăng nhập thành công",
-            token,
-            user: { id: user._id, name: user.name, email: user.email, role: user.role }
+            user: { 
+                _id: user._id, 
+                name: user.name, 
+                email: user.email, 
+                role: user.role 
+            }
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-}
-
-
+};
 
 /* ==============================
    6. REFRESH TOKEN

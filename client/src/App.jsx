@@ -20,6 +20,10 @@ import BlogDetailPage from './pages/user/Blog/BlogDetailPage';
 import ProductListPage from './pages/user/Product/ProductListPage';
 import BlogListPage from './pages/user/Blog/BlogListPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import AdminOrderManagement from './pages/admin/Order/AdminOrderManagement';
+import AdminOrderDetail from './pages/admin/Order/AdminOrderDetail';
+import OrderHistory from './pages/user/Order/OrderHistory';
+
 
 
 function App() {
@@ -56,7 +60,8 @@ function App() {
                 <Route path="/admin/products" element={<ProductManagement />} />
                 <Route path="/admin/add-product" element={<AddProduct />} />
                 <Route path="/admin/product/:id" element={<EditProduct />} />
-                <Route path="/admin/orders" element={<div className="p-8">Quản lý đơn hàng</div>} />
+                <Route path="/admin/orders" element={<AdminOrderManagement />} />
+                <Route path="/admin/orders/:id" element={<AdminOrderDetail />} />
                 <Route path="/admin/returns" element={<div className="p-8">Quản lý trả hàng</div>} />
                 <Route path="/admin/blog" element={<BlogManagement />} />
                 <Route path="/admin/blog/create" element={<CreateBlog />} />
@@ -84,7 +89,8 @@ function App() {
               <Route path="products" element={<ProductListPage />} />
               <Route path="/blog/:slug" element={<BlogDetailPage />} />\
               <Route path="blog" element={<BlogListPage />} />
-              
+              <Route path="/orders/history" element={<OrderHistory />} />
+             
             </Route>
             {/* Các trang BẮT BUỘC ĐĂNG NHẬP mới vào được */}
               <Route element={<ProtectedRoute />}>

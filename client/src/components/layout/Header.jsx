@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingBag, User, LogOut } from 'lucide-react'; 
+import { Menu, X, ShoppingBag, User, LogOut, History, Package, UserCircle } from 'lucide-react'; 
 import { useCart } from '../../contexts/CartContext';
 import LogoBaoLinh from '../../assets/logo-bao-linh.svg';
 
@@ -19,19 +19,18 @@ const Header = () => {
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   // Theo dõi trạng thái đăng nhập
-useEffect(() => {
-  const checkAuth = () => {
-    const savedUser = localStorage.getItem('user');
-    setUser(savedUser ? JSON.parse(savedUser) : null);
-  };
+  useEffect(() => {
+    const checkAuth = () => {
+      const savedUser = localStorage.getItem('user');
+      setUser(savedUser ? JSON.parse(savedUser) : null);
+    };
 
-  checkAuth();
-  
-  // Lắng nghe sự kiện thay đổi storage
-  window.addEventListener('storage', checkAuth);
-  return () => window.removeEventListener('storage', checkAuth);
-}, [location.pathname]); // Chạy lại khi đổi trang hoặc khi có sự kiện storage
-
+    checkAuth();
+    
+    // Lắng nghe sự kiện thay đổi storage
+    window.addEventListener('storage', checkAuth);
+    return () => window.removeEventListener('storage', checkAuth);
+  }, [location.pathname]); // Chạy lại khi đổi trang hoặc khi có sự kiện storage
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -58,11 +57,17 @@ useEffect(() => {
     }
   };
 
+  const handleMenuItemClick = (path) => {
+    setIsUserMenuOpen(false);
+    setIsMobileMenuOpen(false);
+    navigate(path);
+  };
+
   return (
     <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${
       isScrolled 
         ? 'bg-white shadow-md py-2 text-slate-800' 
-        : 'bg-white/80 backdrop-blur-md py-4 text-slate-900' // Đổi từ transparent sang trắng mờ để thấy chữ
+        : 'bg-white/80 backdrop-blur-md py-4 text-slate-900'
     }`}>
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
         
@@ -73,7 +78,6 @@ useEffect(() => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 font-semibold">
-          {/* Màu chữ mặc định là text-slate-700 để luôn nhìn thấy rõ */}
           <Link to="/" className="hover:text-orange-600 transition">Home</Link>
           <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="hover:text-orange-600 transition">About</a>
           <a href="#product" onClick={(e) => handleNavClick(e, 'product')} className="hover:text-orange-600 transition">Product</a>
@@ -105,14 +109,43 @@ useEffect(() => {
                   </button>
 
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-3 w-52 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 text-slate-800 animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="px-4 py-3 border-b border-slate-50 mb-1">
+                    <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 text-slate-800 animate-in fade-in slide-in-from-top-2 duration-200">
+                      {/* User Info */}
+                      <div className="px-4 py-3 border-b border-slate-100 mb-1">
                         <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Tài khoản</p>
                         <p className="font-bold truncate text-slate-900">{user?.name}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">{user?.phone}</p>
                       </div>
-                      <Link to="/profile" className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition text-sm font-medium"><User size={16}/> Hồ sơ của tôi</Link>
-                      <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition text-sm font-medium">
-                        <LogOut size={16}/> Đăng xuất
+                      
+                      {/* Menu Items */}
+                      <button 
+                        onClick={() => handleMenuItemClick('/profile')}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition text-sm font-medium text-slate-700"
+                      >
+                        <UserCircle size={16} />
+                        Hồ sơ của tôi
+                      </button>
+                      
+                      <button 
+                        onClick={() => handleMenuItemClick('/orders/history')}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition text-sm font-medium text-slate-700"
+                      >
+                        <History size={16} />
+                        Lịch sử mua hàng
+                      </button>
+                      
+
+                      
+                      {/* Divider */}
+                      <div className="border-t border-slate-100 my-1"></div>
+                      
+                      {/* Logout Button */}
+                      <button 
+                        onClick={handleLogout} 
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-red-600 hover:bg-red-50 transition text-sm font-medium"
+                      >
+                        <LogOut size={16} />
+                        Đăng xuất
                       </button>
                     </div>
                   )}
@@ -137,25 +170,78 @@ useEffect(() => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-2xl border-t p-6 flex flex-col gap-4 font-bold text-slate-800">
-          <Link to="/" className="hover:text-orange-600 transition">Home</Link>
+        <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-2xl border-t p-6 flex flex-col gap-4 font-bold text-slate-800 max-h-[80vh] overflow-y-auto">
+          <Link to="/" className="hover:text-orange-600 transition" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
           <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="hover:text-orange-600 transition">About</a>
           <a href="#product" onClick={(e) => handleNavClick(e, 'product')} className="hover:text-orange-600 transition">Product</a>
           <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="hover:text-orange-600 transition">Contact</a>
-          <Link to="/blog" className="hover:text-orange-600 transition">Blog</Link>
+          <Link to="/blog" className="hover:text-orange-600 transition" onClick={() => setIsMobileMenuOpen(false)}>Blog</Link>
+          
           {isLoggedIn ? (
-            <div className="pt-4 border-t space-y-4">
-              <Link to="/cart" className="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
+            <div className="pt-4 border-t space-y-3">
+              {/* User Info */}
+              <div className="bg-slate-50 p-4 rounded-xl mb-2">
+                <p className="text-xs text-slate-500 uppercase tracking-wider">Tài khoản</p>
+                <p className="font-bold text-slate-900">{user?.name}</p>
+                <p className="text-sm text-slate-500">{user?.phone}</p>
+              </div>
+              
+              {/* Cart Link */}
+              <Link 
+                to="/cart" 
+                className="flex justify-between items-center bg-slate-50 p-3 rounded-xl hover:bg-slate-100 transition"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 <span>Giỏ hàng</span>
                 <span className="bg-orange-600 text-white px-2 py-0.5 rounded-full text-xs">{totalItems}</span>
               </Link>
-              <Link to="/profile" className="block p-3">Hồ sơ cá nhân</Link>
-              <button onClick={handleLogout} className="w-full text-left p-3 text-red-600">Đăng xuất</button>
+              
+              {/* Profile Link */}
+              <Link 
+                to="/profile" 
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <UserCircle size={20} />
+                <span>Hồ sơ của tôi</span>
+              </Link>
+              
+              {/* Order History Link */}
+              <Link 
+                to="/orders/history" 
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <History size={20} />
+                <span>Lịch sử mua hàng</span>
+              </Link>
+              
+
+              {/* Logout Button */}
+              <button 
+                onClick={handleLogout} 
+                className="w-full flex items-center gap-3 p-3 text-red-600 hover:bg-red-50 rounded-xl transition mt-2"
+              >
+                <LogOut size={20} />
+                <span>Đăng xuất</span>
+              </button>
             </div>
           ) : (
             <div className="pt-4 border-t flex flex-col gap-3">
-              <Link to="/login" className="w-full py-3 text-center border border-slate-200 rounded-xl hover:text-orange-600">Login</Link>
-              <Link to="/register" className="w-full py-3 text-center bg-orange-600 hover:bg-orange-700 text-white rounded-xl shadow-lg">Get Started</Link>
+              <Link 
+                to="/login" 
+                className="w-full py-3 text-center border border-slate-200 rounded-xl hover:text-orange-600 transition"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Login
+              </Link>
+              <Link 
+                to="/register" 
+                className="w-full py-3 text-center bg-orange-600 hover:bg-orange-700 text-white rounded-xl shadow-lg"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Get Started
+              </Link>
             </div>
           )}
         </div>

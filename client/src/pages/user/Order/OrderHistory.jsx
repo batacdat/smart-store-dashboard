@@ -1,23 +1,31 @@
-// pages/user/OrderHistory.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Package, Search, Eye, Truck, CheckCircle, XCircle, Clock,
   Calendar, Filter, RefreshCcw, Loader2, AlertCircle, 
-  ShoppingBag, MapPin, Phone, User, CreditCard, ChevronDown, 
-  ChevronUp, ArrowLeft, Receipt, Printer
+  ShoppingBag, ArrowLeft, Phone, MapPin, User, CreditCard, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../../../api/axios';
 import toast from 'react-hot-toast';
 import Header from '../../../components/layout/Header';
 import Footer from '../../../components/layout/Footer';
+import { useSocket } from '../../../contexts/SocketContext';
+import { useSocketEvents } from '../../../hooks/useSocketEvents';
 
 const OrderHistory = () => {
   const navigate = useNavigate();
+  
+  // Lấy thông tin user từ localStorage
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
+  const { socket } = useSocket() || {};
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [cancellingOrder, setCancellingOrder] = useState(null);
   const [cancelReason, setCancelReason] = useState('');
@@ -43,11 +51,75 @@ const OrderHistory = () => {
     { value: '6months', label: '6 tháng qua' }
   ];
 
+  // Lắng nghe sự kiện storage để cập nhật user khi đăng nhập/đăng xuất
   useEffect(() => {
-    fetchOrders();
+    const handleStorageChange = () => {
+      const savedUser = localStorage.getItem('user');
+      setUser(savedUser ? JSON.parse(savedUser) : null);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const fetchOrders = async () => {
+  // Gửi thông báo join room khi có user
+  useEffect(() => {
+    if (socket && user?._id) {
+  
+      socket.emit("user-join", user._id);
+      socket.emit("register-user", user._id);
+    }
+  }, [socket, user]);
+
+  // Lắng nghe sự kiện socket cho user
+  const socketEvents = {
+    "my-order-status-updated": (data) => {
+
+      
+      setOrders(prev => prev.map(order => 
+        order._id === data.orderId 
+          ? { ...order, status: data.newStatus, ...data.order }
+          : order
+      ));
+      
+      toast.success(`Đơn hàng ${data.orderCode} đã chuyển sang trạng thái: ${data.newStatus}`, {
+        duration: 4000,
+        position: 'top-right'
+      });
+      
+      // Nếu đang mở chi tiết đơn hàng này, cập nhật lại
+      if (expandedOrder === data.orderId) {
+        setExpandedOrder(null);
+        setTimeout(() => setExpandedOrder(data.orderId), 100);
+      }
+    },
+    
+    "my-payment-status-updated": (data) => {
+      
+      
+      setOrders(prev => prev.map(order => 
+        order._id === data.orderId 
+          ? { ...order, paymentStatus: data.newPaymentStatus, paymentInfo: data.paymentInfo, ...data.order }
+          : order
+      ));
+      
+      const statusIcon = data.newPaymentStatus === 'Đã thanh toán' ? '✅' : '💳';
+      toast.success(`${statusIcon} Đơn hàng ${data.orderCode}: ${data.newPaymentStatus}`, {
+        duration: 3000,
+        position: 'top-right'
+      });
+    }
+  };
+
+  useSocketEvents(socketEvents, [user]);
+
+  // Fetch orders
+  const fetchOrders = useCallback(async () => {
+    if (!user?._id) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await axios.get('/orders/myorders');
@@ -65,8 +137,17 @@ const OrderHistory = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, navigate]);
 
+  useEffect(() => {
+    if (user) {
+      fetchOrders();
+    } else {
+      setLoading(false);
+    }
+  }, [user, fetchOrders]);
+
+  // Hủy đơn hàng
   const handleCancelOrder = async (orderId) => {
     if (!cancelReason.trim()) {
       toast.error('Vui lòng nhập lý do hủy đơn');
@@ -89,10 +170,19 @@ const OrderHistory = () => {
     }
   };
 
-  const handleReorder = (order) => {
-    // Logic thêm lại sản phẩm vào giỏ hàng
-    toast.success('Đã thêm sản phẩm vào giỏ hàng');
-    navigate('/cart');
+  // Format functions
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
   };
 
   const getStatusConfig = (status) => {
@@ -116,7 +206,14 @@ const OrderHistory = () => {
     return config[status] || { color: 'bg-gray-100 text-gray-800', icon: <CreditCard size={12} /> };
   };
 
+  const canCancelOrder = (status) => {
+    return status === 'Chờ xác nhận' || status === 'Đang xử lý';
+  };
+
+  // Filter functions
   const filterByDateRange = (order) => {
+    if (selectedDateRange === 'all') return true;
+    
     const orderDate = new Date(order.createdAt);
     const now = new Date();
     const daysDiff = Math.floor((now - orderDate) / (1000 * 60 * 60 * 24));
@@ -135,8 +232,10 @@ const OrderHistory = () => {
     }
   };
 
-  const filteredOrders = orders
-    .filter(order => {
+  const filteredOrders = useMemo(() => {
+    if (!Array.isArray(orders)) return [];
+    
+    return orders.filter(order => {
       const matchesStatus = filterStatus === 'all' || order.status === filterStatus;
       const matchesSearch = 
         order.orderCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -145,30 +244,10 @@ const OrderHistory = () => {
       const matchesDate = filterByDateRange(order);
       return matchesStatus && matchesSearch && matchesDate;
     });
+  }, [orders, searchTerm, filterStatus, selectedDateRange]);
 
-  const canCancelOrder = (status) => {
-    return status === 'Chờ xác nhận' || status === 'Đang xử lý';
-  };
-
-  const canReorder = (status) => {
-    return status === 'Đã giao';
-  };
-
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
-  };
-
-  const getOrderStats = () => {
+  // Stats
+  const stats = useMemo(() => {
     return {
       total: orders.length,
       pending: orders.filter(o => o.status === 'Chờ xác nhận').length,
@@ -176,11 +255,34 @@ const OrderHistory = () => {
       shipping: orders.filter(o => o.status === 'Đang giao').length,
       delivered: orders.filter(o => o.status === 'Đã giao').length,
       cancelled: orders.filter(o => o.status === 'Đã hủy').length,
-      totalSpent: orders.reduce((sum, o) => sum + o.totalAmount, 0)
+      totalSpent: orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0)
     };
-  };
+  }, [orders]);
 
-  const stats = getOrderStats();
+  // Nếu chưa đăng nhập
+  if (!user) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-slate-50 pt-32 pb-20">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-12 text-center">
+              <ShoppingBag className="mx-auto text-slate-300 mb-4" size={64} />
+              <h3 className="text-xl font-bold text-slate-700 mb-2">Vui lòng đăng nhập</h3>
+              <p className="text-slate-500 mb-6">Bạn cần đăng nhập để xem lịch sử đơn hàng</p>
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors"
+              >
+                Đăng nhập ngay
+              </Link>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   if (loading) {
     return (
@@ -188,7 +290,7 @@ const OrderHistory = () => {
         <Header />
         <div className="min-h-screen flex items-center justify-center bg-slate-50 pt-32">
           <div className="text-center">
-            <Loader2 className="animate-spin text-orange-600 mx-auto mb-4" size={48} />
+            <Loader2 className="animate-spin text-indigo-600 mx-auto mb-4" size={48} />
             <p className="text-slate-500">Đang tải lịch sử đơn hàng...</p>
           </div>
         </div>
@@ -206,7 +308,7 @@ const OrderHistory = () => {
           <div className="mb-8">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-slate-500 hover:text-orange-600 transition-colors mb-4"
+              className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors mb-4"
             >
               <ArrowLeft size={18} />
               Quay lại
@@ -214,7 +316,7 @@ const OrderHistory = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
-                  <ShoppingBag className="text-orange-600" size={32} />
+                  <ShoppingBag className="text-indigo-600" size={32} />
                   Lịch sử mua hàng
                 </h1>
                 <p className="text-slate-500 mt-1">Quản lý và theo dõi tất cả đơn hàng của bạn</p>
@@ -249,7 +351,7 @@ const OrderHistory = () => {
             </div>
             <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 col-span-2 md:col-span-1">
               <p className="text-xs text-slate-500 uppercase tracking-wider">Tổng chi tiêu</p>
-              <p className="text-xl font-bold text-orange-600">{formatPrice(stats.totalSpent)}</p>
+              <p className="text-xl font-bold text-indigo-600">{formatPrice(stats.totalSpent)}</p>
             </div>
           </div>
 
@@ -263,7 +365,7 @@ const OrderHistory = () => {
                   placeholder="Tìm theo mã đơn, tên người nhận, số điện thoại..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                 />
               </div>
               
@@ -274,7 +376,7 @@ const OrderHistory = () => {
                     onClick={() => setFilterStatus(status.value)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition-all text-sm font-medium ${
                       filterStatus === status.value
-                        ? 'bg-orange-600 text-white shadow-md'
+                        ? 'bg-indigo-600 text-white shadow-md'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
@@ -325,7 +427,7 @@ const OrderHistory = () => {
               </p>
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors"
               >
                 <ShoppingBag size={18} />
                 Mua sắm ngay
@@ -349,10 +451,7 @@ const OrderHistory = () => {
                         <div className="flex items-center gap-4 flex-wrap">
                           <div>
                             <p className="text-xs text-slate-500 uppercase tracking-wider">Mã đơn hàng</p>
-                            <div className="flex items-center gap-2">
-                              <Receipt size={14} className="text-orange-600" />
-                              <p className="font-bold text-slate-900 font-mono">{order.orderCode}</p>
-                            </div>
+                            <p className="font-bold text-slate-900 font-mono">#{order.orderCode}</p>
                           </div>
                           <div>
                             <p className="text-xs text-slate-500 uppercase tracking-wider">Ngày đặt</p>
@@ -363,7 +462,7 @@ const OrderHistory = () => {
                           </div>
                           <div>
                             <p className="text-xs text-slate-500 uppercase tracking-wider">Tổng tiền</p>
-                            <p className="font-bold text-orange-600">{formatPrice(order.totalAmount)}</p>
+                            <p className="font-bold text-indigo-600">{formatPrice(order.totalAmount)}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
@@ -389,7 +488,7 @@ const OrderHistory = () => {
                                 key={idx}
                                 className="w-12 h-12 bg-slate-100 rounded-lg border-2 border-white overflow-hidden shadow-sm"
                               >
-                                {item.product?.images?.[0] ? (
+                                {item.product?.images?.[0]?.url ? (
                                   <img
                                     src={item.product.images[0].url}
                                     alt={item.name}
@@ -426,22 +525,13 @@ const OrderHistory = () => {
                               Hủy đơn
                             </button>
                           )}
-                          {canReorder(order.status) && (
-                            <button
-                              onClick={() => handleReorder(order)}
-                              className="px-4 py-2 border border-orange-200 text-orange-600 rounded-xl text-sm font-medium hover:bg-orange-50 transition-colors"
-                            >
-                              Mua lại
-                            </button>
-                          )}
                           <button
                             onClick={() => setExpandedOrder(isExpanded ? null : order._id)}
-                            className="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-medium hover:bg-orange-600 transition-colors flex items-center gap-2"
+                            className="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-medium hover:bg-indigo-600 transition-colors flex items-center gap-2"
                           >
                             <Eye size={16} />
                             Xem chi tiết
                           </button>
-
                         </div>
                       </div>
                     </div>
@@ -453,7 +543,7 @@ const OrderHistory = () => {
                           {/* Shipping Info */}
                           <div className="bg-white rounded-xl p-4 shadow-sm">
                             <h4 className="font-bold text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2">
-                              <MapPin size={16} className="text-orange-600" />
+                              <MapPin size={16} className="text-indigo-600" />
                               Thông tin giao hàng
                             </h4>
                             <div className="space-y-2 text-sm">
@@ -480,7 +570,7 @@ const OrderHistory = () => {
                           {/* Payment Info */}
                           <div className="bg-white rounded-xl p-4 shadow-sm">
                             <h4 className="font-bold text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2">
-                              <CreditCard size={16} className="text-orange-600" />
+                              <CreditCard size={16} className="text-indigo-600" />
                               Thông tin thanh toán
                             </h4>
                             <div className="space-y-2 text-sm">
@@ -507,14 +597,14 @@ const OrderHistory = () => {
                         {/* Products List */}
                         <div className="mt-6">
                           <h4 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
-                            <Package size={16} className="text-orange-600" />
+                            <Package size={16} className="text-indigo-600" />
                             Danh sách sản phẩm
                           </h4>
                           <div className="space-y-3">
                             {order.products?.map((item, idx) => (
                               <div key={idx} className="flex items-center gap-4 p-3 bg-white rounded-xl border border-slate-100 hover:shadow-sm transition-shadow">
                                 <div className="w-16 h-16 bg-slate-50 rounded-lg overflow-hidden flex-shrink-0">
-                                  {item.product?.images?.[0] ? (
+                                  {item.product?.images?.[0]?.url ? (
                                     <img
                                       src={item.product.images[0].url}
                                       alt={item.name}
@@ -531,7 +621,7 @@ const OrderHistory = () => {
                                   <p className="text-sm text-slate-500">Số lượng: {item.quantity}</p>
                                 </div>
                                 <div className="text-right">
-                                  <p className="font-bold text-orange-600">{formatPrice(item.price * item.quantity)}</p>
+                                  <p className="font-bold text-indigo-600">{formatPrice(item.price * item.quantity)}</p>
                                   <p className="text-xs text-slate-400">{formatPrice(item.price)} / cái</p>
                                 </div>
                               </div>
@@ -545,15 +635,15 @@ const OrderHistory = () => {
                             <div className="w-72 space-y-2">
                               <div className="flex justify-between text-sm">
                                 <span className="text-slate-500">Tạm tính:</span>
-                                <span>{formatPrice(order.totalAmount - order.shippingFee)}</span>
+                                <span>{formatPrice(order.totalAmount - (order.shippingFee || 0))}</span>
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span className="text-slate-500">Phí vận chuyển:</span>
-                                <span>{formatPrice(order.shippingFee)}</span>
+                                <span>{formatPrice(order.shippingFee || 0)}</span>
                               </div>
                               <div className="flex justify-between text-lg font-bold pt-2 border-t border-slate-200">
                                 <span className="text-slate-900">Tổng thanh toán:</span>
-                                <span className="text-orange-600">{formatPrice(order.totalAmount)}</span>
+                                <span className="text-indigo-600">{formatPrice(order.totalAmount)}</span>
                               </div>
                             </div>
                           </div>

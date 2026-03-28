@@ -7,7 +7,13 @@ import App from './App.jsx'
 import { HelmetProvider } from 'react-helmet-async'
 import { CartProvider } from './contexts/CartContext.jsx'
 
+if (import.meta.env.MODE === 'production') {
+console.log = () => {};
+console.error = () => {};
+console.debug = () => {};
+}
 createRoot(document.getElementById('root')).render(
+
   <StrictMode>
     <BrowserRouter>
       <Toaster position="top-right" />

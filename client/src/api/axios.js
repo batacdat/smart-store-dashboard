@@ -8,7 +8,7 @@ const instance = axios.create({
 // ❌ KHÔNG thêm token vào header khi dùng cookie
 instance.interceptors.request.use(
   (config) => {
-    console.log(`📤 ${config.method.toUpperCase()} ${config.url}`);
+  //  console.log(`📤 ${config.method.toUpperCase()} ${config.url}`);
     // Không thêm Authorization header vì đã dùng cookie
     return config;
   },

@@ -131,13 +131,13 @@ const CartPage = () => {
         paymentStatus: 'Chưa thanh toán'
       };
 
-      console.log('Sending order data:', orderData);
-      console.log('With credentials:', true);
+      //('Sending order data:', orderData);
+      //('With credentials:', true);
 
       // Gọi API tạo đơn hàng - Cookie sẽ tự động được gửi
       const response = await axios.post('/orders', orderData);
 
-      console.log('Response:', response.data);
+      //('Response:', response.data);
 
       if (response.data.success) {
         toast.success(response.data.message || "Đặt hàng thành công!");

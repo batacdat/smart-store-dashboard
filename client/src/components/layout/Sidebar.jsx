@@ -93,7 +93,7 @@ const Sidebar = ({ isCollapsed, setisCollapsed, isMobileOpen, setIsMobileOpen })
             <div className="flex items-center gap-2">
               <div className="bg-teal-600 p-2 rounded-xl text-white"><Store size={22} /></div>
               <div>
-                <h1 className="text-md font-black text-slate-800 leading-none">ChongThamBaoLinh</h1>
+                <h1 className="text-md font-black text-slate-800 leading-none">CTBL </h1>
                 <p className="text-[9px] text-slate-400 font-bold uppercase mt-0.5">Admin</p>
               </div>
             </div>

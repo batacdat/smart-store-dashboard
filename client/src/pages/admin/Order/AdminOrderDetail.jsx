@@ -1,4 +1,3 @@
-// AdminOrderDetail.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -9,6 +8,7 @@ import {
 import axios from '../../../api/axios';
 import toast from 'react-hot-toast';
 import InvoiceTemplate from './InvoiceTemplate';
+import { useSocketEvents } from '../../../hooks/useSocketEvents'; // Import socket hook
 
 const AdminOrderDetail = () => {
   const { id } = useParams();
@@ -50,16 +50,53 @@ const AdminOrderDetail = () => {
     };
   }, [id, fetchOrderDetail]);
 
+  // Socket events for real-time updates
+  const socketEvents = {
+    'order-status-updated': (data) => {
+      // Chỉ cập nhật nếu đây là đơn hàng hiện tại
+      if (data.orderId === id) {
+       
+        setOrder(prevOrder => ({
+          ...prevOrder,
+          status: data.newStatus,
+          ...data.order
+        }));
+        toast.success(`Đơn hàng đã được cập nhật sang trạng thái: ${data.newStatus}`, {
+          duration: 3000,
+          position: 'top-right'
+        });
+      }
+    },
+    
+    'payment-status-updated': (data) => {
+      // Chỉ cập nhật nếu đây là đơn hàng hiện tại
+      if (data.orderId === id) {
+        //('Nhận cập nhật thanh toán realtime:', data);
+        setOrder(prevOrder => ({
+          ...prevOrder,
+          paymentStatus: data.newPaymentStatus,
+          paymentInfo: data.paymentInfo,
+          ...data.order
+        }));
+        toast.success(`Thanh toán đã được cập nhật: ${data.newPaymentStatus}`, {
+          duration: 3000,
+          position: 'top-right'
+        });
+      }
+    }
+  };
+
+  // Sử dụng socket hook
+  useSocketEvents(socketEvents, [id]);
+
   const handlePrint = () => {
-    if (isPrinting) return; // Ngăn in nhiều lần
+    if (isPrinting) return;
     
     setIsPrinting(true);
     
-    // Lưu trạng thái hiện tại của body
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     
-    // Đợi DOM render xong mới in
     setTimeout(() => {
       try {
         window.print();
@@ -67,10 +104,8 @@ const AdminOrderDetail = () => {
         console.error('Print error:', error);
         toast.error('Có lỗi khi in hóa đơn');
       } finally {
-        // Khôi phục lại trạng thái sau khi in
         document.body.style.overflow = originalOverflow;
         
-        // Reset trạng thái in sau 1 giây
         printTimeoutRef.current = setTimeout(() => {
           setIsPrinting(false);
         }, 1000);
@@ -79,11 +114,13 @@ const AdminOrderDetail = () => {
   };
 
   const handleUpdateStatus = async (newStatus) => {
+    if (newStatus === order.status) return;
+    
     setUpdating(true);
     try {
       const { data } = await axios.put(`/orders/${id}/status`, { status: newStatus });
       if (data.success) {
-        toast.success(`Trạng thái: ${newStatus}`);
+        toast.success(`Đã cập nhật trạng thái: ${newStatus}`);
         setOrder(data.data);
       }
     } catch (error) {
@@ -112,7 +149,6 @@ const AdminOrderDetail = () => {
     }
   };
 
-  // Hàm kiểm tra trạng thái có thể thay đổi không
   const isStatusChangeable = (status) => {
     if (order.status === 'Đã hủy' || order.status === 'Đã giao') return false;
     return true;

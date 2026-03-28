@@ -1,5 +1,6 @@
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
+
 // Tạo đơn hàng mới
 export const createOrder = async (req, res) => {
   try {
@@ -38,6 +39,31 @@ export const createOrder = async (req, res) => {
       paymentMethod
     });
 
+    // Populate thông tin để gửi qua socket
+    const populatedOrder = await Order.findById(newOrder._id)
+      .populate('user', 'name phone email')
+      .populate('products.product', 'name images price');
+
+    // --- SOCKET.IO: Thông báo cho Admin về đơn hàng mới ---
+    if (req.io) {
+      try {
+        req.io.emit('new-order-admin', {
+          success: true,
+          message: "Bạn có một đơn hàng mới cần xử lý",
+          orderId: newOrder._id,
+          orderCode: newOrder.orderCode,
+          customer: shippingInfo.fullName,
+          customerPhone: shippingInfo.phone,
+          totalAmount: newOrder.totalAmount,
+          createdAt: newOrder.createdAt,
+          order: populatedOrder
+        });
+        console.log(`📨 Đã gửi thông báo socket cho đơn hàng mới: ${newOrder.orderCode}`);
+      } catch (socketError) {
+        console.error('Lỗi khi gửi socket notification:', socketError);
+      }
+    }
+
     res.status(201).json({
       success: true,
       message: "Đơn hàng đã được tạo thành công",
@@ -52,7 +78,6 @@ export const createOrder = async (req, res) => {
     });
   }
 };
-
 // Lấy tất cả đơn hàng (Dành cho Admin)
 export const getAllOrders = async (req, res) => {
   try {
@@ -138,6 +163,7 @@ export const getMyOrders = async (req, res) => {
 export const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
+    const oldStatus = (await Order.findById(req.params.id))?.status;
     const order = await Order.findById(req.params.id);
 
     if (!order) {
@@ -190,7 +216,45 @@ export const updateOrderStatus = async (req, res) => {
     await order.save();
 
     // Quan trọng: Populate lại thông tin sản phẩm để tránh lỗi trắng trang ở Frontend
-    const updatedOrder = await Order.findById(order._id).populate('products.product');
+    const updatedOrder = await Order.findById(order._id)
+      .populate('user', 'name phone email')
+      .populate('products.product', 'name images price');
+
+    // --- SOCKET.IO: Thông báo cập nhật trạng thái đơn hàng ---
+    if (req.io) {
+      try {
+        // Gửi thông báo đến admin
+        req.io.emit('order-status-updated', {
+          success: true,
+          message: `Đơn hàng ${order.orderCode} đã được cập nhật trạng thái: ${status}`,
+          orderId: order._id,
+          orderCode: order.orderCode,
+          oldStatus: oldStatus,
+          newStatus: status,
+          updatedAt: new Date(),
+          order: updatedOrder
+        });
+
+        // Gửi thông báo riêng đến user sở hữu đơn hàng (nếu user đang online)
+        if (order.user && global.onlineUsers?.has(order.user.toString())) {
+          const userSocketId = global.onlineUsers.get(order.user.toString());
+          req.io.to(userSocketId).emit('my-order-status-updated', {
+            success: true,
+            message: `Đơn hàng ${order.orderCode} của bạn đã được cập nhật trạng thái: ${status}`,
+            orderId: order._id,
+            orderCode: order.orderCode,
+            oldStatus: oldStatus,
+            newStatus: status,
+            updatedAt: new Date(),
+            order: updatedOrder
+          });
+        }
+
+        console.log(`📨 Đã gửi thông báo socket cập nhật trạng thái đơn hàng: ${order.orderCode} -> ${status}`);
+      } catch (socketError) {
+        console.error('Lỗi khi gửi socket notification:', socketError);
+      }
+    }
 
     res.status(200).json({
       success: true,
@@ -220,6 +284,7 @@ export const updatePaymentStatus = async (req, res) => {
       });
     }
 
+    const oldPaymentStatus = order.paymentStatus;
     order.paymentStatus = paymentStatus;
     
     if (paymentStatus === 'Đã thanh toán' && paymentInfo) {
@@ -231,10 +296,52 @@ export const updatePaymentStatus = async (req, res) => {
 
     await order.save();
 
+    // Populate lại thông tin để gửi qua socket
+    const updatedOrder = await Order.findById(order._id)
+      .populate('user', 'name phone email')
+      .populate('products.product', 'name images price');
+
+    // --- SOCKET.IO: Thông báo cập nhật trạng thái thanh toán ---
+    if (req.io) {
+      try {
+        // Gửi thông báo đến admin
+        req.io.emit('payment-status-updated', {
+          success: true,
+          message: `Đơn hàng ${order.orderCode} đã được cập nhật trạng thái thanh toán: ${paymentStatus}`,
+          orderId: order._id,
+          orderCode: order.orderCode,
+          oldPaymentStatus: oldPaymentStatus,
+          newPaymentStatus: paymentStatus,
+          paymentInfo: order.paymentInfo,
+          updatedAt: new Date(),
+          order: updatedOrder
+        });
+
+        // Gửi thông báo riêng đến user sở hữu đơn hàng (nếu user đang online)
+        if (order.user && global.onlineUsers?.has(order.user.toString())) {
+          const userSocketId = global.onlineUsers.get(order.user.toString());
+          req.io.to(userSocketId).emit('my-payment-status-updated', {
+            success: true,
+            message: `Đơn hàng ${order.orderCode} của bạn đã được cập nhật trạng thái thanh toán: ${paymentStatus}`,
+            orderId: order._id,
+            orderCode: order.orderCode,
+            oldPaymentStatus: oldPaymentStatus,
+            newPaymentStatus: paymentStatus,
+            updatedAt: new Date(),
+            order: updatedOrder
+          });
+        }
+
+        console.log(`📨 Đã gửi thông báo socket cập nhật thanh toán: ${order.orderCode} -> ${paymentStatus}`);
+      } catch (socketError) {
+        console.error('Lỗi khi gửi socket notification:', socketError);
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: "Cập nhật trạng thái thanh toán thành công",
-      data: order
+      data: updatedOrder
     });
   } catch (error) {
     console.error('Error updating payment status:', error);
@@ -246,6 +353,7 @@ export const updatePaymentStatus = async (req, res) => {
   }
 };
 
+// Hủy đơn hàng (Người dùng)
 // Hủy đơn hàng (Người dùng)
 export const cancelOrder = async (req, res) => {
   try {
@@ -275,16 +383,42 @@ export const cancelOrder = async (req, res) => {
       });
     }
 
+    const oldStatus = order.status;
     order.status = 'Đã hủy';
     order.cancelledAt = Date.now();
     order.cancelledReason = reason || 'Khách hàng hủy đơn';
 
     await order.save();
 
+    const updatedOrder = await Order.findById(order._id)
+      .populate('user', 'name phone email')
+      .populate('products.product', 'name images price');
+
+    // --- SOCKET.IO: Thông báo khi user hủy đơn ---
+    if (req.io) {
+      try {
+        req.io.emit('order-cancelled-by-user', {
+          success: true,
+          message: `Đơn hàng ${order.orderCode} đã được khách hàng hủy`,
+          orderId: order._id,
+          orderCode: order.orderCode,
+          cancelledReason: order.cancelledReason,
+          cancelledAt: order.cancelledAt,
+          oldStatus: oldStatus,
+          newStatus: 'Đã hủy',
+          order: updatedOrder
+        });
+
+        console.log(`📨 Đã gửi thông báo socket: Khách hàng hủy đơn ${order.orderCode}`);
+      } catch (socketError) {
+        console.error('Lỗi khi gửi socket notification:', socketError);
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: "Đơn hàng đã được hủy thành công",
-      data: order
+      data: updatedOrder
     });
   } catch (error) {
     console.error('Error cancelling order:', error);
@@ -307,7 +441,7 @@ export const getOrderStats = async (req, res) => {
     const cancelledOrders = await Order.countDocuments({ status: 'Đã hủy' });
 
     const totalRevenue = await Order.aggregate([
-      { $match: { status: 'Đã giao', paymentStatus: 'Đã thanh toán' } },
+      { $match: {  paymentStatus: 'Đã thanh toán' } },
       { $group: { _id: null, total: { $sum: '$totalAmount' } } }
     ]);
 

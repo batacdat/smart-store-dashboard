@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Eye, Search, Filter, Calendar, Package, ChevronRight, Loader2, RefreshCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import axios from '../../../api/axios'; // Đảm bảo đường dẫn này đúng với file axios.js của bạn
+import axios from '../../../api/axios';
 import toast from 'react-hot-toast';
+import { useSocketEvents } from '../../../hooks/useSocketEvents'; // Import socket hook
 
 const AdminOrderManagement = () => {
   const navigate = useNavigate();
@@ -12,8 +13,8 @@ const AdminOrderManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const statusTabs = ['Tất cả', 'Chờ xác nhận', 'Đang xử lý', 'Đang giao', 'Đã giao', 'Đã hủy'];
-
-  // 1. Fetch dữ liệu từ API (Route: /api/orders/admin/orders)
+const alertSound = useMemo(() => new Audio('/sounds/notification.mp3'), []);
+  // Fetch dữ liệu từ API
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -32,13 +33,103 @@ const AdminOrderManagement = () => {
     fetchOrders();
   }, []);
 
-  // 2. Logic Lọc và Tìm kiếm
+  // Socket events for real-time updates
+  const socketEvents = {
+    'new-order-admin': (data) => {
+      
+      // 1. Phát âm thanh
+      alertSound.currentTime = 0; // Chơi lại từ đầu nếu có nhiều đơn liên tiếp
+      alertSound.play().catch(err => {
+        err.message("Âm thanh bị chặn bởi trình duyệt. Admin cần click vào trang web trước.");
+      });
+
+      toast.success(`${data.customer} vừa đặt đơn hàng ${data.orderCode}`, {
+        duration: 5000,
+        position: 'top-right',
+        icon: '🛒'
+      });
+      
+      // Phát âm thanh thông báo (nếu muốn)
+      try {
+        const audio = new Audio('/sounds/notification1.wav');
+        audio.play().catch(e => console.log('Audio play failed:', e));
+      } catch (error) {
+        console.log('Audio not supported');
+      }
+      
+      // Thêm đơn hàng mới vào đầu danh sách
+      if (data.order) {
+        setOrders(prevOrders => [data.order, ...prevOrders]);
+      } else {
+        // Nếu không có order data, fetch lại
+        fetchOrders();
+      }
+    },
+    
+    'order-status-updated': (data) => {
+     
+      
+      // Cập nhật trạng thái trong danh sách
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order._id === data.orderId 
+            ? { ...order, status: data.newStatus, ...data.order }
+            : order
+        )
+      );
+      
+      toast.info(`Đơn hàng ${data.orderCode} đã chuyển sang trạng thái: ${data.newStatus}`, {
+        duration: 3000,
+        position: 'top-right'
+      });
+    },
+    
+    'payment-status-updated': (data) => {
+  
+      
+      // Cập nhật trạng thái thanh toán trong danh sách
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order._id === data.orderId 
+            ? { ...order, paymentStatus: data.newPaymentStatus, ...data.order }
+            : order
+        )
+      );
+      
+      toast.success(`Đơn hàng ${data.orderCode} đã cập nhật thanh toán: ${data.newPaymentStatus}`, {
+        duration: 3000,
+        position: 'top-right'
+      });
+    },
+    
+    'order-cancelled-by-user': (data) => {
+   
+      // Cập nhật trạng thái trong danh sách
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order._id === data.orderId 
+            ? { ...order, status: 'Đã hủy', cancelledReason: data.cancelledReason, ...data.order }
+            : order
+        )
+      );
+      
+      toast.error(`Đơn hàng ${data.orderCode} đã bị hủy bởi khách hàng ${data.customer}`, {
+        duration: 5000,
+        position: 'top-right'
+      });
+    }
+  };
+
+  // Sử dụng socket hook
+  useSocketEvents(socketEvents, []);
+
+  // Logic Lọc và Tìm kiếm
   const filteredOrders = orders.filter(order => {
     const matchesStatus = activeTab === 'Tất cả' || order.status === activeTab;
     const matchesSearch = 
-        order.orderCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.shippingInfo.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.shippingInfo.phone.includes(searchTerm);
+        order.orderCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.shippingInfo?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.shippingInfo?.phone?.includes(searchTerm);
     return matchesStatus && matchesSearch;
   });
 
@@ -139,8 +230,8 @@ const AdminOrderManagement = () => {
                       </td>
                       <td className="px-6 py-5">
                         <div className="flex flex-col">
-                          <span className="font-bold text-slate-700 text-sm">{order.shippingInfo.fullName}</span>
-                          <span className="text-xs text-slate-400 font-medium">{order.shippingInfo.phone}</span>
+                          <span className="font-bold text-slate-700 text-sm">{order.shippingInfo?.fullName}</span>
+                          <span className="text-xs text-slate-400 font-medium">{order.shippingInfo?.phone}</span>
                         </div>
                       </td>
                       <td className="px-6 py-5 text-center">

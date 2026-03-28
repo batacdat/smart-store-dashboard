@@ -13,5 +13,14 @@ export default defineConfig({
         secure: false,
       }
     }
-  }
+  },
+  build: {
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Tự động xóa tất cả console.log
+        drop_debugger: true, // Tự động xóa tất cả debugger
+      },
+    },
+  },
 })

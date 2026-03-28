@@ -38,7 +38,7 @@ const BlogSection = () => {
           </h2>
           <h3 className="text-3xl md:text-4xl font-black text-slate-900 tracking-wider leading-snug md:leading-relaxed">
             Cập nhật mới nhất từ <br/> 
-            <span className="text-orange-600 uppercase">CHONGTHAMBAOLINH</span>
+            <span className="text-orange-600 uppercase text-[24px] md:text-3xl">CHONGTHAMBAOLINH</span>
           </h3>
           <div className="w-24 h-1.5 bg-orange-600 mx-auto mt-8 rounded-full"></div>
         </div>

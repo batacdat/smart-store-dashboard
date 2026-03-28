@@ -41,7 +41,7 @@ const AboutSection = () => {
             <span className="text-orange-600">Chống Thấm Hiệu Quả</span>
           </h2>
 
-          <p className="text-lg text-slate-600 leading-relaxed">
+          <p className="text-md md:text-lg text-slate-600 leading-relaxed">
             Tại <strong>Bảo Linh</strong>, chúng tôi không chỉ cung cấp vật liệu chống thấm, chúng tôi còn mang đến giải pháp chống thấm hoàn toàn mới. Với hơn 10 năm kinh nghiệm, chúng tôi tự hào là đơn vị tiên phong trong việc tích hợp công nghệ vào không gian sống và làm việc.
           </p>
 

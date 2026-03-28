@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingBag, User, LogOut, History, Package, UserCircle } from 'lucide-react'; 
+import { Menu, X, ShoppingBag, User, LogOut, History, Package, UserCircle, Key } from 'lucide-react'; 
 import { useCart } from '../../contexts/CartContext';
 import LogoBaoLinh from '../../assets/logo-bao-linh.svg';
 
@@ -134,7 +134,14 @@ const Header = () => {
                         Lịch sử mua hàng
                       </button>
                       
-
+                      {/* Nút Đổi mật khẩu - Thêm mới */}
+                      <button 
+                        onClick={() => handleMenuItemClick('/change-password')}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition text-sm font-medium text-slate-700"
+                      >
+                        <Key size={16} />
+                        Đổi mật khẩu
+                      </button>
                       
                       {/* Divider */}
                       <div className="border-t border-slate-100 my-1"></div>
@@ -174,8 +181,8 @@ const Header = () => {
           <Link to="/" className="hover:text-orange-600 transition" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
           <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="hover:text-orange-600 transition">About</a>
           <a href="#product" onClick={(e) => handleNavClick(e, 'product')} className="hover:text-orange-600 transition">Product</a>
+          <a href="#blog" onClick={(e) => handleNavClick(e, 'blog')} className="hover:text-orange-600 transition">Blog</a>
           <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="hover:text-orange-600 transition">Contact</a>
-          <Link to="/blog" className="hover:text-orange-600 transition" onClick={() => setIsMobileMenuOpen(false)}>Blog</Link>
           
           {isLoggedIn ? (
             <div className="pt-4 border-t space-y-3">
@@ -216,6 +223,15 @@ const Header = () => {
                 <span>Lịch sử mua hàng</span>
               </Link>
               
+              {/* Change Password Link - Thêm mới cho mobile */}
+              <Link 
+                to="/change-password" 
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Key size={20} />
+                <span>Đổi mật khẩu</span>
+              </Link>
 
               {/* Logout Button */}
               <button 

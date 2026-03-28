@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, MessageSquare, Clock } from 'lucide-react';
-import axios from 'axios';
+import axios from '../../../api/axios';
+import { toast } from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
 const ContactSection = () => {
     const [loading, setLoading] = useState(false);
@@ -21,14 +23,14 @@ const ContactSection = () => {
 
     try {
       // Gọi API đến Backend của bạn
-      const response = await axios.post('/api/contact', formData);
+      const response = await axios.post('/contact', formData);
       
       if (response.data.success) {
-        alert("Cảm ơn bạn! Tin nhắn đã được gửi đến muinv2512@gmail.com");
+        toast.success("Cảm ơn bạn! Tin nhắn đã được gửi đến muinv2512@gmail.com");
         setFormData({ name: '', email: '', subject: '', message: '' });
       }
     } catch (error) {
-      alert(error.response?.data?.message || "Có lỗi xảy ra khi gửi tin nhắn.");
+      toast.error(error.response?.data?.message || "Có lỗi xảy ra khi gửi tin nhắn.");
     } finally {
       setLoading(false);
     }
@@ -41,8 +43,8 @@ const ContactSection = () => {
         {/* Tiêu đề */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-orange-600 font-bold uppercase tracking-widest text-sm italic">Liên hệ với chúng tôi</span>
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mt-3 mb-6 ">Bạn cần hỗ trợ? Hãy gửi lời nhắn cho Bảo Linh</h2>
-          <p className="text-slate-500 text-lg">Đội ngũ kỹ thuật của chúng tôi luôn sẵn sàng lắng nghe và giải đáp mọi thắc mắc của bạn về giải pháp công nghệ.</p>
+          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mt-3 mb-6 ">Bạn cần hỗ trợ? Hãy gửi lời nhắn cho Bảo Linh</h2>
+          <p className="text-slate-500 text-md md:text-lg">Đội ngũ kỹ thuật của chúng tôi luôn sẵn sàng lắng nghe và giải đáp mọi thắc mắc của bạn về giải pháp công nghệ.</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-16 items-start">
@@ -57,8 +59,8 @@ const ContactSection = () => {
                   <MapPin size={28} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900 text-xl mb-1">Địa chỉ trụ sở</h4>
-                  <p className="text-slate-500 leading-relaxed">188 Nguyễn Xiển, Thanh Xuân, Hà Nội</p>
+                  <h4 className="font-bold text-slate-900 text-md md:text-lg lg:text-xl mb-1">Địa chỉ trụ sở</h4>
+                  <p className="text-slate-500 leading-relaxed text-md md:text-lg lg:text-xl">188 Nguyễn Xiển, Thanh Xuân, Hà Nội</p>
                 </div>
               </div>
 
@@ -68,9 +70,9 @@ const ContactSection = () => {
                   <Mail size={28} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900 text-xl mb-1">Email hỗ trợ</h4>
-                  <p className="text-slate-500">support@baolinh.com</p>
-                  <p className="text-slate-500">info@baolinh.com</p>
+                  <h4 className="font-bold text-slate-900 text-md md:text-lg lg:text-xl mb-1">Email hỗ trợ</h4>
+                  <p className="text-slate-500 text-md md:text-lg lg:text-xl">support@baolinh.com</p>
+                  <p className="text-slate-500 text-md md:text-lg lg:text-xl">info@baolinh.com</p>
                 </div>
               </div>
 
@@ -80,8 +82,8 @@ const ContactSection = () => {
                   <Phone size={28} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900 text-xl mb-1">Liên hệ</h4>
-                  <p className="text-slate-500 font-bold text-lg">0903 232 492 - 0989 690 256</p>
+                  <h4 className="font-bold text-slate-900 text-md md:text-lg lg:text-xl mb-1">Liên hệ</h4>
+                  <p className="text-slate-500 font-bold text-md md:text-lg lg:text-xl">0903 232 492 <br/> 0989 690 256</p>
                   <p className="text-slate-400 text-sm italic">Hỗ trợ 24/7</p>
                 </div>
               </div>

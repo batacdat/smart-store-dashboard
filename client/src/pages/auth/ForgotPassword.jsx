@@ -86,17 +86,17 @@ const ForgotPassword = () => {
         <div className="w-full md:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center animate-fade-in">
           <div className="mb-10">
             {/* Icon Store với tông Indigo */}
-            <div className="flex items-center gap-2 mb-4 text-indigo-600 font-black italic text-xl uppercase tracking-tighter ">
+            <div className="flex items-center gap-2 mb-4 text-orange-600 font-black italic text-xl uppercase tracking-tighter ">
               <img src={logo} alt="Logo" className="h-8" />
               chongthambaolinh
             </div>
 
             {/* Tiêu đề chữ lớn, in hoa, nghiêng giống Login */}
-            <h2 className="text-3xl font-black text-slate-800 tracking-tight italic uppercase leading-tight">
+            <h2 className="text-2xl md:text-3xl font-black text-slate-700 tracking-tight italic uppercase leading-tight">
               {step === 1 ? "Quên mật khẩu?" : "Xác thực OTP"}
             </h2>
             {/* Subtitle chữ nhỏ, spacing rộng giống Login */}
-            <p className="text-slate-400 text-[11px] font-black uppercase tracking-wide mt-2 leading-relaxed">
+            <p className="text-slate-400 text-[10px] font-black uppercase tracking-wider mt-2 leading-relaxed">
               {step === 1 
                 ? "Nhập SĐT tài khoản và Email để nhận mã khôi phục" 
                 : `Mã đã gửi đến email đăng ký`}
@@ -110,13 +110,13 @@ const ForgotPassword = () => {
               <div className="space-y-1.5 group relative">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 ml-1">Số điện thoại tài khoản</label>
                 <div className="relative relative-input-group">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-300 group-focus-within:text-orange-500 transition-colors" />
                   <input
                     type="text"
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-transparent rounded-xl outline-none focus:border-indigo-100 focus:bg-white transition-all text-sm font-bold text-slate-700 placeholder:text-slate-300"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-transparent rounded-xl outline-none focus:border-orange-100 focus:bg-white transition-all text-sm font-bold text-slate-700 placeholder:text-slate-300"
                     placeholder="09xxxxxxxxx"
                     required
                   />
@@ -127,13 +127,13 @@ const ForgotPassword = () => {
               <div className="space-y-1.5 group relative">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 ml-1">Email nhận mã OTP</label>
                 <div className="relative relative-input-group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-300 group-focus-within:text-orange-500 transition-colors" />
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-transparent rounded-xl outline-none focus:border-indigo-100 focus:bg-white transition-all text-sm font-bold text-slate-700 placeholder:text-slate-300"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-transparent rounded-xl outline-none focus:border-orange-100 focus:bg-white transition-all text-sm font-bold text-slate-700 placeholder:text-slate-300"
                     placeholder="example@gmail.com"
                     required
                   />
@@ -144,7 +144,7 @@ const ForgotPassword = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black uppercase text-[11px] tracking-[0.2em] shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-70 mt-6"
+                className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-black uppercase text-[11px] tracking-[0.2em] shadow-xl shadow-orange-100 flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-70 mt-6"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : (
                   <>
@@ -167,7 +167,7 @@ const ForgotPassword = () => {
                     name="otp"
                     value={formData.otp}
                     onChange={handleChange}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-transparent rounded-xl outline-none focus:border-indigo-100 focus:bg-white transition-all text-sm font-bold text-slate-700 tracking-[0.5em] text-center"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-transparent rounded-xl outline-none focus:border-orange-100 focus:bg-white transition-all text-sm font-bold text-slate-700 tracking-[0.5em] text-center"
                     placeholder="000000"
                     maxLength={6}
                     required
@@ -179,13 +179,13 @@ const ForgotPassword = () => {
               <div className="space-y-group relative group">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Mật khẩu mới</label>
                 <div className="relative relative-input-group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-300 group-focus-within:text-orange-500 transition-colors" />
                   <input
                     type={showNewPass ? "text" : "password"}
                     name="newPassword"
                     value={formData.newPassword}
                     onChange={handleChange}
-                    className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-transparent rounded-xl outline-none focus:border-indigo-100 focus:bg-white transition-all text-sm font-bold text-slate-700"
+                    className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-transparent rounded-xl outline-none focus:border-orange-100 focus:bg-white transition-all text-sm font-bold text-slate-700"
                     placeholder="••••••••"
                     required
                   />
@@ -203,13 +203,13 @@ const ForgotPassword = () => {
               <div className="space-y-group relative group">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Xác nhận mật khẩu</label>
                 <div className="relative relative-input-group">
-                  <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
+                  <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-300 group-focus-within:text-orange-500 transition-colors" />
                   <input
                     type={showConfirmPass ? "text" : "password"}
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-transparent rounded-xl outline-none focus:border-indigo-100 focus:bg-white transition-all text-sm font-bold text-slate-700"
+                    className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-transparent rounded-xl outline-none focus:border-orange-100 focus:bg-white transition-all text-sm font-bold text-slate-700"
                     placeholder="••••••••"
                     required
                   />
@@ -227,7 +227,7 @@ const ForgotPassword = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black uppercase text-[11px] tracking-[0.2em] shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-70 mt-6"
+                className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-black uppercase text-[11px] tracking-[0.2em] shadow-xl shadow-orange-100 flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-70 mt-6"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Cập nhật mật khẩu"}
               </button>
@@ -236,7 +236,7 @@ const ForgotPassword = () => {
               <button 
                 type="button"
                 onClick={() => setStep(1)}
-                className="w-full text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-colors pt-3"
+                className="w-full text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-orange-600 transition-colors pt-3"
               >
                 Nhập lại thông tin khác?
               </button>
@@ -247,7 +247,7 @@ const ForgotPassword = () => {
           <div className="mt-10 text-center border-t border-slate-50 pt-6">
             <p className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">
               Đã nhớ mật khẩu?{' '}
-              <Link to="/login" className="text-indigo-600 font-black hover:underline inline-flex items-center gap-1">
+              <Link to="/login" className="text-orange-600 font-black hover:underline inline-flex items-center gap-1">
                 Đăng nhập
               </Link>
             </p>
@@ -263,7 +263,7 @@ const ForgotPassword = () => {
               alt="Forgot Password Art" 
             />
             {/* Gradient tông Indigo sâu hơn giống Login */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-950/40 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-transparent to-transparent"></div>
             <div className="absolute bottom-8 left-8 right-8 text-white">
               <h3 className="text-xl font-black italic uppercase">Smart Choice.</h3>
               <p className="text-[10px] font-bold text-white/80 uppercase tracking-widest mt-1">Hệ thống bảo mật tối ưu</p>

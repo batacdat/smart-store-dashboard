@@ -77,7 +77,7 @@ const BlogDetailPage = () => {
             <span className="px-4 py-1.5 bg-orange-100 text-orange-600 rounded-full text-xs font-black uppercase tracking-widest">
               {blog.category}
             </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.2] tracking-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-6xl font-black text-slate-900 leading-[1.2] tracking-tight">
               {blog.title}
             </h1>
             
@@ -119,7 +119,7 @@ const BlogDetailPage = () => {
         )}
 
         {/* Nội dung chính: whitespace-pre-line giữ ngắt nghỉ dòng */}
-        <div className="text-lg text-slate-700 leading-relaxed whitespace-pre-line mb-16">
+        <div className="text-md md:text-lg text-slate-700 leading-relaxed whitespace-pre-line mb-16">
           {blog.content}
         </div>
 
@@ -152,7 +152,7 @@ const BlogDetailPage = () => {
                     ></iframe>
                 </div>
                 <p className="text-orange-100 text-sm font-medium italic text-center">
-                    Bảo Linh Tech - Trực tiếp thi công và giám sát chất lượng sản phẩm
+                    ChongThamBaoLinh - Trực tiếp thi công và giám sát chất lượng sản phẩm
                 </p>
             </div>
           </div>

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { ShoppingCart, Star, ShieldCheck, Truck, RotateCcw, Minus, Plus } from 'lucide-react';
+import { ShoppingCart, Star, ShieldCheck, Truck, RotateCcw, Minus, Plus, ArrowLeft } from 'lucide-react';
 import { useCart } from '../../../contexts/CartContext';
 
 const ProductDetailPage = () => {
@@ -65,8 +65,19 @@ const handleAddToCart = () => {
   return (
     <div className="bg-white pt-28 pb-20">
       <div className="container mx-auto px-4 md:px-6">
+        {/* Nút quay lại */}
+        <div className="mb-10 flex items-center justify-between gap-4 flex-wrap">
+          <button 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2.5 text-slate-600 hover:text-orange-600 font-bold transition-colors text-sm bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 active:scale-95"
+          >
+            <ArrowLeft size={18} />
+            Quay về Trang chủ
+          </button>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-12">
-          
+   
           {/* CỘT TRÁI: GALLERY ẢNH */}
           <div className="w-full lg:w-1/2 space-y-4">
             <div className="aspect-square rounded-2xl overflow-hidden bg-slate-50 border border-slate-100 shadow-sm">
@@ -89,19 +100,19 @@ const handleAddToCart = () => {
           <div className="w-full lg:w-1/2 space-y-6">
             <div className="space-y-2">
               <span className="text-orange-600 font-bold text-sm tracking-widest uppercase">{product.category || 'Công Nghệ'}</span>
-              <h1 className="text-3xl md:text-4xl font-black text-slate-900 leading-tight">{product.name}</h1>
+              <h1 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">{product.name}</h1>
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex text-yellow-400"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /></div>
                 <span className="text-slate-400">|</span>
-                <span className="text-slate-600 font-medium">Đã bán {product.sold || 0}</span>
+                <span className="text-slate-600 font-medium">Đã bán {product.sold || 50}</span>
               </div>
             </div>
 
-            <div className="text-4xl font-black text-orange-600">
+            <div className="text-2xl md:text-3xl lg:text-4xl font-black text-orange-600">
               {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
             </div>
 
-            <p className="text-slate-600 leading-relaxed text-lg border-y py-6 border-slate-100 whitespace-pre-line">
+            <p className="text-slate-600 leading-relaxed text-md md:text-lg border-y py-6 border-slate-100 whitespace-pre-line">
               {product.description || "Chưa có mô tả chi tiết cho sản phẩm này."}
             </p>
 
@@ -131,7 +142,7 @@ const handleAddToCart = () => {
                 <ShieldCheck className="text-orange-500" /> Chính hãng 100%
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-600 font-medium bg-slate-50 p-4 rounded-xl">
-                <Truck className="text-orange-500" /> Free Ship HN/HCM
+                <Truck className="text-orange-500" /> Free Ship HCM
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-600 font-medium bg-slate-50 p-4 rounded-xl">
                 <RotateCcw className="text-orange-500" /> Đổi trả 7 ngày

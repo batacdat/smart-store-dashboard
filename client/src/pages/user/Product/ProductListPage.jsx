@@ -67,7 +67,7 @@ const ProductListPage = () => {
             <ChevronRight size={14} />
             <span className="text-slate-900">Sản phẩm</span>
           </nav>
-          <h1 className="text-4xl md:text-5xl font-black text-slate-900">
+          <h1 className="text-3xl md:text-5xl font-black text-slate-900">
             Tất cả <span className="text-orange-600">Sản phẩm</span>
           </h1>
         </div>
@@ -151,10 +151,10 @@ const ProductListPage = () => {
                     {product.name}
                   </h3>
                   <div className="mt-auto flex items-center justify-between">
-                    <span className="text-2xl font-black text-orange-600">
+                    <span className="text-xl md:text-2xl font-black text-orange-600">
                       {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
                     </span>
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">Đã bán {product.sold || 0}</span>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">Đã bán {product.sold || 50}</span>
                   </div>
                 </div>
               </div>

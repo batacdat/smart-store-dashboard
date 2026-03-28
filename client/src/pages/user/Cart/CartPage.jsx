@@ -249,7 +249,7 @@ const CartPage = () => {
             
             {/* DANH SÁCH SẢN PHẨM */}
             <div className="lg:w-2/3 space-y-6">
-              <h1 className="text-4xl font-black text-slate-900 mb-8 flex items-center gap-3">
+              <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-8 flex items-center gap-3">
                 <ShoppingBag className="text-orange-600" size={36} />
                 Giỏ hàng <span className="text-orange-600">({cartItems.length})</span>
               </h1>
@@ -264,8 +264,8 @@ const CartPage = () => {
                     />
                   </div>
                   <div className="flex-grow text-center md:text-left">
-                    <h3 className="font-bold text-slate-900 mb-1.5 text-lg group-hover:text-orange-600 transition-colors line-clamp-2">{item.name}</h3>
-                    <p className="text-orange-600 font-black text-2xl tracking-tight">{new Intl.NumberFormat('vi-VN').format(item.price)}<span className='text-base ml-0.5'>đ</span></p>
+                    <h3 className="font-bold text-slate-900 mb-1.5 text-md md:text-lg group-hover:text-orange-600 transition-colors line-clamp-2">{item.name}</h3>
+                    <p className="text-orange-600 font-black text-xl md:text-2xl tracking-tight">{new Intl.NumberFormat('vi-VN').format(item.price)}<span className='text-base ml-0.5'>đ</span></p>
                   </div>
                   <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto mt-4 md:mt-0">
                     <button onClick={() => openDeleteModal(item)} className="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors self-end md:self-auto">
@@ -295,23 +295,23 @@ const CartPage = () => {
             {/* TỔNG KẾT */}
             <div className="lg:w-1/3 mt-10 lg:mt-0">
               <div className="bg-white p-9 rounded-[3rem] shadow-2xl shadow-slate-200/40 sticky top-32 border border-white">
-                <h2 className="text-2xl font-black text-slate-900 mb-8 uppercase tracking-wider flex items-center gap-2.5">
+                <h2 className="text-md md:text-xl lg:text-2xl font-black text-slate-900 mb-8 uppercase tracking-wider flex items-center gap-2.5">
                   <Banknote size={28} className="text-orange-600" /> Tóm tắt đơn hàng
                 </h2>
                 <div className="space-y-5 mb-10">
-                  <div className="flex justify-between text-slate-600 font-bold text-base">
+                  <div className="flex justify-between text-slate-600 font-bold text-sm">
                     <span>Tạm tính ({cartItems.length} sản phẩm)</span>
                     <span>{new Intl.NumberFormat('vi-VN').format(totalPrice)}đ</span>
                   </div>
-                  <div className="flex justify-between text-slate-600 font-bold text-base pb-5 border-b border-slate-100">
+                  <div className="flex justify-between text-slate-600 font-bold text-sm pb-5 border-b border-slate-100">
                     <span>Phí vận chuyển</span>
                     <span className={shippingFee === 0 ? "text-green-500 font-black uppercase tracking-widest text-sm" : "font-black"}>
                       {shippingFee === 0 ? "Miễn phí" : `${new Intl.NumberFormat('vi-VN').format(shippingFee)}đ`}
                     </span>
                   </div>
                   <div className="pt-3 flex justify-between items-end">
-                    <span className="text-xl font-bold text-slate-900">Tổng thanh toán</span>
-                    <span className="text-4xl font-black text-orange-600 tracking-tighter">
+                    <span className="text-md md:text-xl font-bold text-slate-900">Tổng thanh toán</span>
+                    <span className="text-xl md:text-2xl font-black text-orange-600 tracking-tighter">
                       {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(finalTotal)}
                     </span>
                   </div>

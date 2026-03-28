@@ -69,11 +69,11 @@ const UserLoginPage = () => {
         {/* PHẦN TRÁI: FORM ĐĂNG NHẬP */}
         <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
           <div className="mb-8">
-            <div className="flex items-center gap-2 mb-4 text-indigo-600 font-black italic text-xl uppercase tracking-tighter ">
+            <div className="flex items-center gap-2 mb-4 text-orange-600 font-black italic text-xl uppercase tracking-tighter ">
               <img src={logo} alt="Logo" className="h-8" />
               chongthambaolinh
             </div>
-            <h2 className="text-3xl font-black text-slate-800 tracking-tight italic uppercase">Đăng nhập</h2>
+            <h2 className="text-2xl md:text-3xl font-black text-slate-700 tracking-tight italic uppercase">Đăng nhập</h2>
             <p className="text-slate-400 text-[11px] font-black uppercase tracking-wider mt-2">Tiếp tục hành trình mua sắm của bạn</p>
           </div>
 
@@ -82,12 +82,12 @@ const UserLoginPage = () => {
             <div className="space-y-1.5 group">
               <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 ml-1">Số điện thoại</label>
               <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors" size={18} />
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-orange-500 transition-colors" size={18} />
                 <input 
                   type="text" 
                   name="phone"
                   placeholder="098xxx"
-                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-indigo-100 transition-all text-sm font-bold text-slate-700"
+                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-orange-100 transition-all text-sm font-bold text-slate-700"
                   value={formData.phone}
                   onChange={handleChange}
                   required
@@ -99,15 +99,15 @@ const UserLoginPage = () => {
             <div className="space-y-1.5 group">
               <div className="flex justify-between items-center px-1">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Mật khẩu</label>
-                <Link to="/forgot-password" size={18} className="text-[10px] font-bold text-indigo-600 uppercase hover:underline">Quên mật khẩu?</Link>
+                <Link to="/forgot-password" size={18} className="text-[10px] font-bold text-orange-600 uppercase hover:underline">Quên mật khẩu?</Link>
               </div>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors" size={18} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-orange-500 transition-colors" size={18} />
                 <input 
                   type={showPass ? "text" : "password"}
                   name="password"
                   placeholder="••••••••"
-                  className="w-full pl-12 pr-12 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-indigo-100 transition-all text-sm font-bold text-slate-700"
+                  className="w-full pl-12 pr-12 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-orange-100 transition-all text-sm font-bold text-slate-700"
                   value={formData.password}
                   onChange={handleChange}
                   required
@@ -115,7 +115,7 @@ const UserLoginPage = () => {
                 <button 
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-indigo-500 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-orange-500 transition-colors"
                 >
                   {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -126,7 +126,7 @@ const UserLoginPage = () => {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold uppercase text-[11px] tracking-wider shadow-lg shadow-indigo-100 flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-70 mt-4"
+              className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold uppercase text-[11px] tracking-wider shadow-lg shadow-orange-100 flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-70 mt-4"
             >
               {loading ? <Loader2 className="animate-spin" size={18} /> : (
                 <>
@@ -153,7 +153,7 @@ const UserLoginPage = () => {
             <div className="text-center mt-4">
               <p className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">
                 Chưa có tài khoản?{' '}
-                <Link to="/register" className="text-indigo-600 font-black hover:underline">
+                <Link to="/register" className="text-orange-600 font-black hover:underline">
                   Đăng ký ngay
                 </Link>
               </p>
@@ -169,7 +169,7 @@ const UserLoginPage = () => {
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
               alt="Shopping Art" 
             />
-            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/40 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-transparent to-transparent"></div>
             <div className="absolute bottom-8 left-8 right-8 text-white">
               <h3 className="text-xl font-black italic uppercase">Smart Choice.</h3>
               <p className="text-[10px] font-bold text-white/80 uppercase tracking-widest mt-1">Trải nghiệm mua sắm công nghệ đỉnh cao</p>

@@ -55,7 +55,7 @@ const handleQuickAddToCart = (product) => {
     <div className="container mx-auto px-4 md:px-6">
       <div className="text-center mb-12">
         <span className="text-orange-600 font-black uppercase tracking-widest text-sm">Sản phẩm nổi bật</span>
-        <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2 tracking-wider">Giải Pháp Công Nghệ Mới Nhất</h2>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2 tracking-wider">Giải Pháp Chống Thấm Mới Nhất</h2>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -100,7 +100,7 @@ const handleQuickAddToCart = (product) => {
                   <span className="text-xl font-black text-orange-600">
                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
                   </span>
-                  <span className="text-xs font-medium text-slate-400">Đã bán {product.sold || 0}</span>
+                  <span className="text-xs font-medium text-slate-400">Đã bán {product.sold || 50}</span>
                 </div>
               </div>
             </div>

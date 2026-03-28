@@ -50,7 +50,7 @@ const BlogListPage = () => {
             <ChevronRight size={14} />
             <span className="text-slate-900">Tin tức & Sự kiện</span>
           </nav>
-          <h1 className="text-4xl md:text-5xl font-black text-slate-900">
+          <h1 className="text-3xl md:text-5xl font-black text-slate-900">
             Kiến thức <span className="text-orange-600">Chống thấm</span>
           </h1>
           <p className="mt-4 text-slate-500 font-medium max-w-2xl">

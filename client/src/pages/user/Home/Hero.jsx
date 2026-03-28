@@ -63,12 +63,12 @@ const Hero = () => {
           {/* Các nút kêu gọi hành động (CTA Buttons) */}
           <div className="flex items-center justify-center gap-6 pt-6">
             <button href="#product" onClick={(e) => handleNavClick(e, 'product')} className="px-10 py-5 bg-white text-orange-600 font-black rounded-2xl hover:bg-slate-900 hover:text-white transition-all shadow-xl shadow-orange-950/20 active:scale-95 uppercase text-sm tracking-widest flex items-center gap-3">
-              <ShoppingCart size={20} />
-              Mua ngay sản phẩm
+              <ShoppingCart size={20} className='hidden md:block' />
+              Mua sản phẩm
             </button>
             <button href="#about" onClick={(e) => handleNavClick(e, 'about')} className="px-10 py-5 bg-transparent text-white font-black rounded-2xl hover:bg-white/10 transition-all text-sm flex items-center gap-2 group border border-white/30">
                Tìm hiểu thêm
-              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={20} className="hidden md:block group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
           

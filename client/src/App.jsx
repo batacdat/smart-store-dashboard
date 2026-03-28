@@ -26,6 +26,7 @@ import AdminOrderDetail from './pages/admin/Order/AdminOrderDetail';
 import OrderHistory from './pages/user/Order/OrderHistory';
 import { SocketProvider } from './contexts/SocketContext'; // Import SocketProvider
 import { getSocket } from './utils/socket'; // Import getSocket
+import UserChangePassword from './pages/auth/UserChangePassword';
 
 function App() {
   const location = useLocation();
@@ -57,7 +58,7 @@ function App() {
 
   // Kiểm tra xem có phải đang ở trang Admin hay không
   const isAdminPage = location.pathname.startsWith('/admin');
-  const isAuthPage = ['/login', '/system-gateway', '/register', '/forgot-password'].includes(location.pathname);
+  const isAuthPage = ['/login', '/system-gateway', '/register', '/forgot-password','/change-password'].includes(location.pathname);
 
   return (
     <SocketProvider> {/* Wrap toàn bộ app với SocketProvider */}
@@ -119,6 +120,7 @@ function App() {
               {/* Các trang BẮT BUỘC ĐĂNG NHẬP mới vào được */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/cart" element={<CartPage />} />
+                <Route path="/change-password" element={<UserChangePassword />} />
               </Route>
               
               {/* Điều hướng mặc định */}

@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 
 // --- MIDDLEWARES ---
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://smart-store-dashboard-production.up.railway.app','https://chongthambaolinh.com.vn'],
+    origin: ['http://localhost:5173', 'https://smart-store-dashboard-rosy.vercel.app','https://chongthambaolinh.com.vn'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']

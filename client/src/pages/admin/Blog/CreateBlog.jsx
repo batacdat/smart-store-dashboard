@@ -17,8 +17,8 @@ const CreateBlog = () => {
     title: '',
     excerpt: '',
     content: '',
-    author: 'Bảo Linh Tech',
-    category: 'Tin tức',
+    author: 'Bảo Linh',
+    category: 'Hướng dẫn thi công',
     status: 'Published',
     thumbnailFile: null,
     videoUrl: '',
@@ -139,8 +139,8 @@ const CreateBlog = () => {
           title: '',
           excerpt: '',
           content: '',
-          author: 'Bảo Linh Tech',
-          category: 'Tin tức',
+          author: 'Bảo Linh',
+          category: 'Hướng dẫn thi công',
           status: 'Published',
           thumbnailFile: null,
           videoUrl: '',
@@ -349,9 +349,9 @@ const CreateBlog = () => {
                   onChange={handleChange}
                   className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-100 transition font-medium text-sm"
                 >
-                  <option value="Tin tức">Tin tức</option>
+                  <option value="Tin tức">Hướng dẫn thi công</option>
                   <option value="Tư vấn">Tư vấn</option>
-                  <option value="Review">Review</option>
+                  <option value="Review">Review sản phẩm</option>
                   <option value="Khuyến mãi">Khuyến mãi</option>
                 </select>
               </div>

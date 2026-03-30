@@ -78,11 +78,11 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 font-semibold">
-          <Link to="/" className="hover:text-orange-600 transition">Home</Link>
-          <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="hover:text-orange-600 transition">About</a>
-          <a href="#product" onClick={(e) => handleNavClick(e, 'product')} className="hover:text-orange-600 transition">Product</a>
-          <a href="#blog" onClick={(e) => handleNavClick(e, 'blog')} className="hover:text-orange-600 transition">Blog</a>
-          <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="hover:text-orange-600 transition">Contact</a>
+          <Link to="/" className="hover:text-orange-600 transition">Trang chủ</Link>
+          <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="hover:text-orange-600 transition">Giới thiệu</a>
+          <a href="#product" onClick={(e) => handleNavClick(e, 'product')} className="hover:text-orange-600 transition">Sản phẩm</a>
+          <a href="#blog" onClick={(e) => handleNavClick(e, 'blog')} className="hover:text-orange-600 transition">Tin tức</a>
+          <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="hover:text-orange-600 transition">Liên hệ</a>
 
           <div className="flex items-center space-x-4 border-l pl-6 border-slate-300">
             {isLoggedIn ? (
@@ -160,9 +160,9 @@ const Header = () => {
               </>
             ) : (
               <>
-                <Link to="/login" className="text-slate-700 hover:text-orange-600 transition font-bold">Login</Link>
+                <Link to="/login" className="text-slate-700 hover:text-orange-600 transition font-bold">Đăng nhập</Link>
                 <Link to="/register" className="px-6 py-2.5 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition shadow-lg shadow-orange-200">
-                  Get Started
+                  Đăng ký
                 </Link>
               </>
             )}
@@ -178,11 +178,11 @@ const Header = () => {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-2xl border-t p-6 flex flex-col gap-4 font-bold text-slate-800 max-h-[80vh] overflow-y-auto">
-          <Link to="/" className="hover:text-orange-600 transition" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-          <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="hover:text-orange-600 transition">About</a>
-          <a href="#product" onClick={(e) => handleNavClick(e, 'product')} className="hover:text-orange-600 transition">Product</a>
-          <a href="#blog" onClick={(e) => handleNavClick(e, 'blog')} className="hover:text-orange-600 transition">Blog</a>
-          <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="hover:text-orange-600 transition">Contact</a>
+          <Link to="/" className="hover:text-orange-600 transition" onClick={() => setIsMobileMenuOpen(false)}>Trang chủ</Link>
+          <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="hover:text-orange-600 transition">Giới thiệu</a>
+          <a href="#product" onClick={(e) => handleNavClick(e, 'product')} className="hover:text-orange-600 transition">Sản phẩm</a>
+          <a href="#blog" onClick={(e) => handleNavClick(e, 'blog')} className="hover:text-orange-600 transition">Tin tức</a>
+          <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="hover:text-orange-600 transition">Liên hệ</a>
           
           {isLoggedIn ? (
             <div className="pt-4 border-t space-y-3">
@@ -205,7 +205,7 @@ const Header = () => {
               
               {/* Profile Link */}
               <Link 
-                to="/profile" 
+                to="#" 
                 className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -249,14 +249,14 @@ const Header = () => {
                 className="w-full py-3 text-center border border-slate-200 rounded-xl hover:text-orange-600 transition"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Login
+                Đăng nhập
               </Link>
               <Link 
                 to="/register" 
                 className="w-full py-3 text-center bg-orange-600 hover:bg-orange-700 text-white rounded-xl shadow-lg"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Get Started
+                Đăng ký
               </Link>
             </div>
           )}

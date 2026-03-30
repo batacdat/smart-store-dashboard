@@ -24,7 +24,7 @@ const AddProduct = () => {
   });
 
   const [previews, setPreviews] = useState([]);
-  const categories = ["Keo chống thấm", "Màng chống thấm", "Sơn chống thấm", "Khác"];
+  const categories = ["Keo chống thấm", "Màng chống thấm", "Lưới thủy tinh", "Khác"];
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

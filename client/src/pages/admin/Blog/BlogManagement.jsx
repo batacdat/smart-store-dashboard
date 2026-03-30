@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { 
   FileText, Plus, Trash2, Search, Filter, 
-  Calendar, User, ChevronRight, MoreVertical, ExternalLink 
+  Calendar, User, ChevronRight, MoreVertical, ExternalLink, 
+  X, AlertTriangle, Loader2
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import moment from 'moment'; // Cài đặt: npm install moment
+import toast from 'react-hot-toast';
 
 const BlogManagement = () => {
   const navigate = useNavigate();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // State cho modal xóa
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingBlog, setDeletingBlog] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Lấy danh sách bài viết từ API
   const fetchBlogs = async () => {
@@ -32,18 +39,38 @@ const BlogManagement = () => {
     fetchBlogs();
   }, []);
 
+  // Mở modal xác nhận xóa
+  const openDeleteModal = (blog) => {
+    setDeletingBlog(blog);
+    setIsDeleteModalOpen(true);
+  };
+
+  // Đóng modal
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingBlog(null);
+  };
+
   // Xử lý xóa bài viết
-  const handleDelete = async (id, title) => {
-    if (window.confirm(`Bạn có chắc chắn muốn xóa bài viết: "${title}"?`)) {
-      try {
-        const response = await axios.delete(`/api/blogs/${id}`);
-        if (response.data.success) {
-          alert("Xóa bài viết thành công!");
-          fetchBlogs(); // Load lại danh sách
-        }
-      } catch (error) {
-        alert("Lỗi khi xóa: " + (error.response?.data?.message || error.message));
+  const handleDelete = async () => {
+    if (!deletingBlog) return;
+    
+    setIsDeleting(true);
+    try {
+      const response = await axios.delete(`/api/blogs/${deletingBlog._id}`);
+      if (response.data.success) {
+        // Đóng modal
+        closeDeleteModal();
+        // Tải lại danh sách
+        await fetchBlogs();
+        // Hiển thị thông báo thành công (có thể dùng toast nếu có)
+        toast.success("Xóa bài viết thành công!");
       }
+    } catch (error) {
+      console.error("Lỗi khi xóa:", error);
+      toast.error("Lỗi khi xóa: " + (error.response?.data?.message || error.message));
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -100,7 +127,7 @@ const BlogManagement = () => {
                   <th className="px-6 py-5 text-xs font-black uppercase tracking-wider text-slate-500">Người đăng</th>
                   <th className="px-6 py-5 text-xs font-black uppercase tracking-wider text-slate-500">Ngày đăng</th>
                   <th className="px-6 py-5 text-xs font-black uppercase tracking-wider text-slate-500 text-right">Thao tác</th>
-                </tr>
+                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {loading ? (
@@ -157,7 +184,7 @@ const BlogManagement = () => {
                             <ExternalLink size={18} />
                           </button>
                           <button 
-                            onClick={() => handleDelete(blog._id, blog.title)}
+                            onClick={() => openDeleteModal(blog)}
                             className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                             title="Xóa bài viết"
                           >
@@ -179,6 +206,83 @@ const BlogManagement = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal Xác nhận Xóa */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="text-white" size={20} />
+                </div>
+                <h3 className="text-lg font-bold text-white">Xác nhận xóa</h3>
+              </div>
+              <button 
+                onClick={closeDeleteModal}
+                className="text-white/80 hover:text-white transition-colors"
+                disabled={isDeleting}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            {/* Modal Content */}
+            <div className="p-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Trash2 className="text-red-500" size={28} />
+                </div>
+                <p className="text-slate-700 font-medium mb-2">
+                  Bạn có chắc chắn muốn xóa bài viết này?
+                </p>
+                <p className="text-sm text-slate-500 mb-4">
+                  Hành động này không thể hoàn tác. Bài viết sẽ bị xóa vĩnh viễn khỏi hệ thống.
+                </p>
+                
+                {deletingBlog && (
+                  <div className="bg-slate-50 rounded-xl p-4 mb-4 text-left border border-slate-100">
+                    <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Thông tin bài viết</p>
+                    <p className="font-bold text-slate-800 text-sm">{deletingBlog.title}</p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Danh mục: {deletingBlog.category} • Ngày đăng: {moment(deletingBlog.createdAt).format('DD/MM/YYYY')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="bg-slate-50 px-6 py-4 flex gap-3 justify-end">
+              <button
+                onClick={closeDeleteModal}
+                disabled={isDeleting}
+                className="px-5 py-2.5 border border-slate-200 rounded-xl text-slate-600 font-bold text-sm hover:bg-white transition-all disabled:opacity-50"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-sm transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    Đang xóa...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={16} />
+                    Xóa vĩnh viễn
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

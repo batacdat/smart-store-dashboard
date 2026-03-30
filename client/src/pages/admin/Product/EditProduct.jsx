@@ -29,7 +29,7 @@ const EditProduct = () => {
 
   const [previews, setPreviews] = useState([]); // Chứa URL để hiển thị (cả ảnh cũ từ server và ảnh mới chọn)
   
-  const categories = ["Keo chống thấm", "Màng chống thấm", "Sơn chống thấm", "Khác"];
+  const categories = ["Keo chống thấm", "Màng chống thấm", "Lưới thủy tinh", "Khác"];
 
   // 1. Lấy dữ liệu sản phẩm hiện tại khi vừa load trang
 useEffect(() => {

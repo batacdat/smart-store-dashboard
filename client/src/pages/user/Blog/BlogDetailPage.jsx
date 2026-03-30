@@ -13,13 +13,19 @@ const BlogDetailPage = () => {
   const [loading, setLoading] = useState(true);
 
   // Hàm hỗ trợ chuyển đổi link Youtube sang link nhúng (Embed)
-  const getEmbedUrl = (url) => {
-    if (!url) return null;
-    // Regex hỗ trợ nhiều định dạng link Youtube khác nhau
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? `https://www.youtube.com/shorts/${match[2]}` : null;
-  };
+const getEmbedUrl = (url) => {
+  if (!url) return null;
+  
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  
+  // Quan trọng: Phải là /embed/ thì iframe mới cho phép phát
+  if (match && match[2].length === 11) {
+    // Luôn trả về URL với giao thức HTTPS đầy đủ
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+  return null;
+};
 
   useEffect(() => {
     const fetchBlogDetail = async () => {
@@ -124,39 +130,41 @@ const BlogDetailPage = () => {
         </div>
 
         {/* 4. KHU VỰC VIDEO LIÊN QUAN (Chỉ hiện khi có videoUrl) */}
-        {embedVideoUrl && (
-          <div className="mt-16 mb-20 p-6 md:p-10 bg-orange-600 rounded-[2.5rem] shadow-2xl shadow-orange-900/20 relative overflow-hidden">
-            {/* Lớp nền trang trí */}
-            <div className="absolute inset-0 z-0 opacity-20 blur-sm">
-                <img src={videoDefaultBg} alt="bg" className="w-full h-full object-cover" />
-            </div>
-            
-            <div className="relative z-10 space-y-6">
-                <div className="flex items-center gap-3 text-white mb-2">
-                    <div className="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                        <Video size={24} />
-                    </div>
-                    <h3 className="text-2xl font-black tracking-tight">
-                        Video thực tế công trình
-                    </h3>
+ {embedVideoUrl && (
+      <div className="mt-16 mb-20 p-6 md:p-10 bg-orange-600 rounded-[2.5rem] shadow-2xl shadow-orange-900/20 relative overflow-hidden">
+        <div className="absolute inset-0 z-0 opacity-20 blur-sm">
+            <img src={videoDefaultBg} alt="bg" className="w-full h-full object-cover" />
+        </div>
+        
+        <div className="relative z-10 space-y-6">
+            <div className="flex items-center gap-3 text-white mb-2">
+                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-md">
+                    <Video size={24} />
                 </div>
+                <h3 className="text-2xl font-black tracking-tight">
+                    Video thực tế công trình
+                </h3>
+            </div>
 
-                <div className="relative aspect-video rounded-3xl overflow-hidden shadow-inner border-4 border-white/30 bg-black">
-                    <iframe 
-                        className="absolute inset-0 w-full h-full"
-                        src={embedVideoUrl} 
-                        title="Video related to blog"
-                        frameBorder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        allowFullScreen
-                    ></iframe>
-                </div>
-                <p className="text-orange-100 text-sm font-medium italic text-center">
-                    ChongThamBaoLinh - Trực tiếp thi công và giám sát chất lượng sản phẩm
-                </p>
+            {/* Tỉ lệ khung hình Video */}
+            <div className="relative aspect-video rounded-3xl overflow-hidden shadow-inner border-4 border-white/30 bg-black">
+            <iframe 
+                className="absolute inset-0 w-full h-full"
+                src={embedVideoUrl} 
+                title="YouTube video player"
+                frameBorder="0" 
+                // Thêm dòng này để tránh lỗi bảo mật trên một số trình duyệt
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+            ></iframe>
             </div>
-          </div>
-        )}
+            <p className="text-orange-100 text-sm font-medium italic text-center">
+                ChongThamBaoLinh - Trực tiếp thi công và giám sát chất lượng sản phẩm
+            </p>
+        </div>
+      </div>
+    )}
 
         {/* 5. FOOTER BÀI VIẾT */}
         <div className="pt-10 border-t border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6">

@@ -1,8 +1,10 @@
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const instance = axios.create({
-  baseURL: '/api',
-  withCredentials: true, // ✅ Quan trọng: gửi cookie tự động
+  baseURL: `${API_URL}/api`,
+  withCredentials: true,
 });
 
 // ❌ KHÔNG thêm token vào header khi dùng cookie

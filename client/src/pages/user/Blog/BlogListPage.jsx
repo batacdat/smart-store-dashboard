@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, User, Search, ChevronRight, Clock, ArrowRight } from 'lucide-react';
-import axios from 'axios';
+import axios from '../../../api/axios';
 
 const BlogListPage = () => {
   const [blogs, setBlogs] = useState([]);
@@ -14,7 +14,7 @@ const BlogListPage = () => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('/api/blogs');
+        const response = await axios.get('/blogs');
         if (response.data.success) {
           setBlogs(response.data.data);
           // Tự động gom nhóm danh mục từ dữ liệu bài viết

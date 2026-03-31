@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, User, ArrowRight } from 'lucide-react';
-import axios from 'axios';
+import axios from '../../../api/axios';
 
 const BlogSection = () => {
   const [blogs, setBlogs] = useState([]);
@@ -11,7 +11,7 @@ const BlogSection = () => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('/api/blogs');
+        const response = await axios.get('/blogs');
         if (response.data.success) {
           setBlogs(response.data.data.slice(0, 3));
         }

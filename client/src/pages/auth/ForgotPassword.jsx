@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Lock, ArrowRight, Loader2, Store, KeyRound, ShieldCheck, EyeOff, Eye, Phone } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import axios from '../../api/axios';
 // Đảm bảo đường dẫn ảnh này chính xác trong dự án của bạn
 import userImage from '../../assets/shopping.jpg'; 
 import logo from '../../assets/logo-bao-linh.svg';
@@ -33,7 +33,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post('/api/auth/forgot-password', { 
+      const { data } = await axios.post('/auth/forgot-password', { 
         phone: formData.phone, 
         email: formData.email 
       });
@@ -56,7 +56,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post('/api/auth/reset-password', {
+      const { data } = await axios.post('/auth/reset-password', {
         phone: formData.phone,
         otp: formData.otp,
         newPassword: formData.newPassword

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // 1. Thêm useNavigate
-import axios from 'axios';
+import axios from '../../../api/axios'; // 2. Sử dụng instance axios đã cấu hình sẵn  
 import { ShoppingCart, Eye, Star, PackageSearch, ArrowRight } from 'lucide-react';
 import { useCart } from '../../../contexts/CartContext';
 
@@ -15,7 +15,7 @@ const ProductSection = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('/api/products'); 
+        const response = await axios.get('/products'); 
         if (response.data && response.data.success) {
           setProducts(response.data.data.slice(0, 8)); 
         }

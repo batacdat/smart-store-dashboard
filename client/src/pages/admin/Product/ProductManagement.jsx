@@ -3,7 +3,7 @@ import {
   Plus, Search, Filter, Edit3, Trash2, Loader2, PackageOpen, AlertTriangle
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../../../api/axios';
 import toast from 'react-hot-toast';
 
 // --- COMPONENT MODAL XÁC NHẬN XÓA ---
@@ -60,7 +60,7 @@ const ProductManagement = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/products');
+      const { data } = await axios.get('/products');
       if (data.success) {
         setProducts(data.data);
       }
@@ -85,7 +85,7 @@ const ProductManagement = () => {
   const handleConfirmDelete = async () => {
     try {
       setDeleteLoading(true);
-      const { data } = await axios.delete(`/api/products/${selectedProduct._id}`);
+      const { data } = await axios.delete(`/products/${selectedProduct._id}`);
       if (data.success) {
         toast.success("Xóa sản phẩm thành công");
         setIsModalOpen(false);

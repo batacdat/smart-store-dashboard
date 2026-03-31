@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../../../api/axios';
 import { ShoppingCart, Eye, Star, Filter, Search, ChevronRight } from 'lucide-react';
 import { useCart } from '../../../contexts/CartContext';
 
@@ -18,7 +18,7 @@ const ProductListPage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await axios.get('/api/products');
+        const res = await axios.get('/products');
         if (res.data.success) {
           setProducts(res.data.data);
           // Lấy danh sách danh mục duy nhất từ sản phẩm

@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../../../api/axios';
 import { ShoppingCart, Star, ShieldCheck, Truck, RotateCcw, Minus, Plus, ArrowLeft } from 'lucide-react';
 import { useCart } from '../../../contexts/CartContext';
 
@@ -44,7 +44,7 @@ const handleAddToCart = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const { data } = await axios.get(`/api/products/${id}`);
+        const { data } = await axios.get(`/products/${id}`);
         if (data.success) {
           setProduct(data.data);
           setActiveImg(data.data.images[0]?.url);

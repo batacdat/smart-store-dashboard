@@ -5,7 +5,7 @@ import {
   X, AlertTriangle, Loader2
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../../../api/axios'; // Đảm bảo bạn đã cấu hình axios instance với baseURL và token nếu cần
 import moment from 'moment'; // Cài đặt: npm install moment
 import toast from 'react-hot-toast';
 
@@ -24,7 +24,7 @@ const BlogManagement = () => {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/blogs');
+      const response = await axios.get('/blogs');
       if (response.data.success) {
         setBlogs(response.data.data);
       }
@@ -57,7 +57,7 @@ const BlogManagement = () => {
     
     setIsDeleting(true);
     try {
-      const response = await axios.delete(`/api/blogs/${deletingBlog._id}`);
+      const response = await axios.delete(`/blogs/${deletingBlog._id}`);
       if (response.data.success) {
         // Đóng modal
         closeDeleteModal();

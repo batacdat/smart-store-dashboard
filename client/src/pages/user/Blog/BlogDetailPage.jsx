@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, User, ArrowLeft, Tag, Share2, Clock, Video } from 'lucide-react';
-import axios from 'axios';
+import axios from '../../../api/axios';
 
 // Ảnh nền dự phòng nếu video không có thumbnail riêng
 import videoDefaultBg from "../../../assets/house.jpg"; 
@@ -31,7 +31,7 @@ const getEmbedUrl = (url) => {
     const fetchBlogDetail = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/blogs/${slug}`);
+        const response = await axios.get(`/blogs/${slug}`);
         if (response.data.success) {
           setBlog(response.data.data);
         }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Lock, User, Phone, ArrowRight, Loader2, Store, Eye, EyeOff } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import axios from '../../api/axios';
 import userImage from '../../assets/shopping.jpg';
 import logo from '../../assets/logo-bao-linh.svg';
 
@@ -28,7 +28,7 @@ const UserRegisterPage = () => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post('/api/auth/register', formData); 
+      const { data } = await axios.post('/auth/register', formData);
       if (data.success) {
         toast.success("Đăng ký thành công!");
         navigate('/login');

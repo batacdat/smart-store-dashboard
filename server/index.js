@@ -21,7 +21,12 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: ['http://localhost:5173', 'http://localhost:3000', '*', 'https://smart-store-dashboard-rosy.vercel.app','https://chongthambaolinh.com.vn'], // Thêm các origin nếu cần
+        origin: [
+            'http://localhost:5173', 
+            'https://smart-store-dashboard-nine.vercel.app',
+            'https://client-frontend-production-9020.up.railway.app',
+            'https://chongthambaolinh.com.vn'
+        ], // Thêm các origin nếu cần
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true
     },
@@ -39,7 +44,12 @@ app.use((req, res, next) => {
 
 // --- MIDDLEWARES ---
 app.use(cors({
-    origin: ['*', 'http://localhost:5173', 'http://localhost:3000', 'https://smart-store-dashboard-rosy.vercel.app','https://chongthambaolinh.com.vn'], // Cho phép tất cả origin hoặc chỉ định cụ thể
+    origin: [
+        'http://localhost:5173', 
+        'https://smart-store-dashboard-nine.vercel.app',
+        'https://client-frontend-production-9020.up.railway.app',
+        'https://chongthambaolinh.com.vn'
+    ], // Cho phép tất cả origin hoặc chỉ định cụ thể
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']

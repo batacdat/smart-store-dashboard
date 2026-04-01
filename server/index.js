@@ -25,7 +25,8 @@ const io = new Server(httpServer, {
             'http://localhost:5173', 
             'https://smart-store-dashboard-nine.vercel.app',
             'https://client-frontend-production-9020.up.railway.app',
-            'https://chongthambaolinh.com.vn'
+            'https://chongthambaolinh.com.vn',
+            'https://www.chongthambaolinh.com.vn'
         ], // Thêm các origin nếu cần
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true
@@ -48,7 +49,9 @@ app.use(cors({
         'http://localhost:5173', 
         'https://smart-store-dashboard-nine.vercel.app',
         'https://client-frontend-production-9020.up.railway.app',
-        'https://chongthambaolinh.com.vn'
+        'https://chongthambaolinh.com.vn',
+        'https://www.chongthambaolinh.com.vn'
+
     ], // Cho phép tất cả origin hoặc chỉ định cụ thể
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],

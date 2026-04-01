@@ -174,16 +174,16 @@ export const login = async (req, res) => {
             // ✅ SET COOKIE token (access token)
             res.cookie('token', token, {
                 httpOnly: true,           // Không cho JS truy cập
-                secure: process.env.NODE_ENV === 'production', // true nếu dùng HTTPS
-                sameSite: 'lax',          // Chống CSRF
+                secure: true,
+                sameSite: "none",         // Chống CSRF
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 ngày
             });
             
             // ✅ SET COOKIE refreshToken
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
+                secure: true,
+                sameSite: "none",
                 maxAge: 30 * 24 * 60 * 60 * 1000 // 30 ngày
             });
             
@@ -287,16 +287,16 @@ export const verifyOTP = async (req, res) => {
         // ✅ SET COOKIE token (access token)
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: true,
+            sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
         
         // ✅ SET COOKIE refreshToken
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: true,
+            sameSite: "none",
             maxAge: 30 * 24 * 60 * 60 * 1000
         });
 
@@ -347,8 +347,8 @@ export const refreshToken = async (req, res) => {
 
         res.cookie("token", newToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+                sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
 
@@ -518,11 +518,15 @@ export const logout = async (req, res) => {
 
     res.cookie("token", "", {
         httpOnly: true,
+        secure: true,
+        sameSite: "none",
         expires: new Date(0)
     })
 
     res.cookie("refreshToken", "", {
         httpOnly: true,
+        secure: true,
+        sameSite: "none",
         expires: new Date(0)
     })
 
